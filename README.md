@@ -2,9 +2,9 @@
 
 A SaaS Journal
 
-* [ ] dependencies
-* [ ] Django
-* [ ] configuration via django-environ
+* [x] dependencies
+* [x] Django
+* [x] configuration via django-environ
 * [ ] Configure web server
 * [ ] testing / coverage
 * [ ] Continuous Integraion
