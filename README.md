@@ -6,8 +6,9 @@ A SaaS Journal
 * [ ] Django
 * [ ] configuration via django-environ
 * [ ] Configure web server
-* [ ] testing
-* [ ] Continuous Integration / pre-commit
+* [ ] testing / coverage
+* [ ] Continuous Integraion
+* [x] pre-commit
 * [ ] Django modeling
 * [ ] Heroku
 

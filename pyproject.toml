@@ -1,0 +1,56 @@
+[tool.bandit]
+skips = ["B101"]
+
+[tool.coverage.report]
+fail_under = 100
+omit = [
+    "*/migrations/*",
+]
+show_missing = true
+skip_covered = true
+
+[tool.isort]
+profile = "black"
+src_paths = ["journal"]
+
+# [tool.mypy]
+# check_untyped_defs = true
+#
+# [[tool.mypy.overrides]]
+# module = [
+#     "allauth.account.models",
+#     "allauth.account.signals",
+#     "allauth.socialaccount.models",
+#     "dj_database_url",
+#     "django.*",
+#     "django_extensions.*",
+#     "djstripe.*",
+#     "environ",
+#     "factory",
+#     "hashid_field.*",
+#     "ordered_model.*",
+#     "responses",
+#     "simple_history.*",
+#     "stripe",
+#     "test_plus.test",
+#     "waffle.*",
+#     "weasyprint",
+#     "whitenoise.middleware",
+# ]
+# ignore_missing_imports = true
+#
+# [tool.pytest.ini_options]
+# addopts = "--nomigrations --disable-socket"
+# DJANGO_SETTINGS_MODULE = "project.testing_settings"
+# filterwarnings = [
+#     # Enable warnings as errors.
+#     "error",
+#     # django-extensions==3.2.0
+#     "ignore:.*'django_extensions' defines.*:DeprecationWarning",
+# ]
+# # This warning is coming from dj-stripe 2.5.1 (Example)
+# #    ignore:.*The providing_args argument is deprecated\..*:DeprecationWarning
+# #    ignore:.*The providing_args argument is deprecated\..*:PendingDeprecationWarning
+# testpaths = [
+#     "homeschool",
+# ]
