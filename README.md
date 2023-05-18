@@ -4,6 +4,7 @@ A SaaS Journal
 
 * [ ] dependencies
 * [ ] Django
+* [ ] configuration via django-environ
 * [ ] Configure web server
 * [ ] testing
 * [ ] Continuous Integration / pre-commit
@@ -14,5 +15,5 @@ A SaaS Journal
 
 ```
 python3 -m venv venv
-pip install -r requirements-dev.txt
+pip install -r requirements-dev.txt -r requirements.txt
 ```
