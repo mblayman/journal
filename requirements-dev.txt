@@ -1,2 +1,5 @@
+factory-boy==3.2.1
 pip-tools
 pre-commit
+pytest-django
+pytest-socket==0.6.0

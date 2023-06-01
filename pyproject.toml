@@ -38,19 +38,17 @@ src_paths = ["journal"]
 #     "whitenoise.middleware",
 # ]
 # ignore_missing_imports = true
-#
-# [tool.pytest.ini_options]
-# addopts = "--nomigrations --disable-socket"
-# DJANGO_SETTINGS_MODULE = "project.testing_settings"
-# filterwarnings = [
-#     # Enable warnings as errors.
-#     "error",
-#     # django-extensions==3.2.0
-#     "ignore:.*'django_extensions' defines.*:DeprecationWarning",
-# ]
-# # This warning is coming from dj-stripe 2.5.1 (Example)
-# #    ignore:.*The providing_args argument is deprecated\..*:DeprecationWarning
-# #    ignore:.*The providing_args argument is deprecated\..*:PendingDeprecationWarning
-# testpaths = [
-#     "homeschool",
-# ]
+
+[tool.pytest.ini_options]
+addopts = "--nomigrations --disable-socket"
+DJANGO_SETTINGS_MODULE = "project.testing_settings"
+filterwarnings = [
+    # Enable warnings as errors.
+    "error",
+]
+# This warning is coming from dj-stripe 2.5.1 (Example)
+#    ignore:.*The providing_args argument is deprecated\..*:DeprecationWarning
+#    ignore:.*The providing_args argument is deprecated\..*:PendingDeprecationWarning
+testpaths = [
+    "journal",
+]
