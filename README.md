@@ -1,16 +1,6 @@
 # journal
 
-A SaaS Journal
-
-* [x] dependencies
-* [x] Django
-* [x] configuration via django-environ
-* [x] Configure web server
-* [ ] Continuous Integration
-* [ ] testing / coverage
-* [x] pre-commit
-* [ ] Django modeling
-* [ ] Heroku
+A SaaS Journal - future source home of journeyinbox.com
 
 ## setup
 
