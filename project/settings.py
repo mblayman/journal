@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # Needed by default templates even though we're not using a social provider.
     "allauth.socialaccount",
     "journal.accounts",
+    "journal.core",
 ]
 
 MIDDLEWARE = [
