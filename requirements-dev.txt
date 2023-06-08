@@ -2,4 +2,6 @@ factory-boy==3.2.1
 pip-tools
 pre-commit
 pytest-django
+pytest-cov==4.1.0
 pytest-socket==0.6.0
+pytest-xdist==3.3.1
