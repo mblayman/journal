@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     DEBUG=(bool, False),
+    EMAIL_BACKEND=(str, "FIXME: replace with anymail backend Issue #10"),
     ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
 )
 environ.Env.read_env(BASE_DIR / ".env")
@@ -122,7 +123,12 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
+# Email
+
+EMAIL_BACKEND = env("EMAIL_BACKEND")
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -158,9 +164,7 @@ SITE_ID = 1
 # ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS => default
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-# TODO: set LOGIN_URL
 # ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL => default
-# TODO: set LOGIN_REDIRECT_URL
 # ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL => default
 # ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS => default
 # ACCOUNT_EMAIL_CONFIRMATION_HMAC => default
