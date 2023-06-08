@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ALLOWED_HOSTS: '*'
+      SECRET_KEY: 'a secret to everybody'
 
     steps:
       - name: Get the code
