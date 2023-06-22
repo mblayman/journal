@@ -23,6 +23,13 @@ jobs:
           cache-dependency-path: 'requirements*.txt'
 
       - name: Install packages
+        run: |
+          # Graphviz support
+          # python3-dev graphviz libgraphviz-dev
+          sudo apt install \
+          python3-dev graphviz libgraphviz-dev
+
+      - name: Install packages
         run: pip install -r requirements.txt -r requirements-dev.txt
 
       # - name: Check types
