@@ -6,20 +6,9 @@ local:
 deploy:
 	git push heroku main
 
-# graph:
-# 	./manage.py graph_models \
-# 		--rankdir BT \
-# 		accounts \
-# 		core \
-# 		courses \
-# 		notifications \
-# 		referrals \
-# 		reports \
-# 		schools \
-# 		students \
-# 		teachers \
-# 		users \
-# 		-o models.png
+# Generate an image of the models in the system.
+graph:
+	./manage.py graph_models
 
 coverage:
 	pytest --cov=journal --migrations -n 2 --dist loadfile

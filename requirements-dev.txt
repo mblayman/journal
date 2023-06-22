@@ -1,6 +1,7 @@
 factory-boy==3.2.1
 pip-tools
 pre-commit
+pygraphviz==1.11
 pytest-django
 pytest-cov==4.1.0
 pytest-socket==0.6.0

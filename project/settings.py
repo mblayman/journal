@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "allauth.account",
     # Needed by default templates even though we're not using a social provider.
     "allauth.socialaccount",
+    "django_extensions",
     "journal.accounts",
     "journal.core",
 ]
@@ -203,3 +204,11 @@ ACCOUNT_USER_DISPLAY = lambda user: user.email  # noqa
 ACCOUNT_USERNAME_REQUIRED = False
 # ACCOUNT_USERNAME_VALIDATORS => default
 # SOCIALACCOUNT_* => default
+
+# django-extensions
+
+GRAPH_MODELS = {
+    "app_labels": ["accounts", "core"],
+    "rankdir": "BT",
+    "output": "models.png",
+}

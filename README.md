@@ -14,3 +14,9 @@ Local superuser:
 * username: matt
 * email: matt@testing.com
 * password: createhorse
+
+## local development tools
+
+```
+CFLAGS="-I/opt/homebrew/Cellar/graphviz/7.0.5/include" LDFLAGS="-L/opt/homebrew/Cellar/graphviz/7.0.5/lib" pip install -r requirements-dev.txt -r requirements.txt
+```
