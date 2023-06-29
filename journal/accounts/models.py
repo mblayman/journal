@@ -4,6 +4,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+class AccountManager(models.Manager):
+    def active(self):
+        """Get all the active accounts."""
+        qs = self.get_queryset()
+        return qs.filter(status__in=self.model.ACTIVE_STATUSES)
+
+
 class Account(models.Model):
     """Account holds the user's state"""
 
@@ -14,6 +21,8 @@ class Account(models.Model):
         CANCELED = 4
         TRIAL_EXPIRED = 5
 
+    ACTIVE_STATUSES = (Status.TRIALING, Status.ACTIVE, Status.EXEMPT)
+
     user = models.OneToOneField(
         "accounts.User",
         on_delete=models.CASCADE,
@@ -23,6 +32,8 @@ class Account(models.Model):
         default=Status.TRIALING,
         db_index=True,
     )
+
+    objects = AccountManager()
 
 
 class User(AbstractUser):
