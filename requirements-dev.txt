@@ -6,3 +6,4 @@ pytest-django
 pytest-cov==4.1.0
 pytest-socket==0.6.0
 pytest-xdist==3.3.1
+time-machine==2.11.0
