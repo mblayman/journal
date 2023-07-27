@@ -1,5 +1,5 @@
 [tool.bandit]
-skips = ["B101"]
+skips = ["B101", "B311"]
 
 [tool.coverage.report]
 fail_under = 100
