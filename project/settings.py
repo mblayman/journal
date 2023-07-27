@@ -121,6 +121,7 @@ LOGOUT_REDIRECT_URL = "/"
 # Email
 
 EMAIL_BACKEND = env("EMAIL_BACKEND")
+EMAIL_SENDGRID_REPLY_TO = env("EMAIL_SENDGRID_REPLY_TO")
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

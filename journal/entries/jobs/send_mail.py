@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core import mail
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -22,6 +23,6 @@ class Job(DailyJob):
                 subject=f"It's {today:%A}, {today:%b}. {today:%-d}, how are you?",
                 message=text_message,
                 html_message=html_message,
-                from_email="who is this from email",
+                from_email=settings.EMAIL_SENDGRID_REPLY_TO,
                 recipient_list=[account.user.email],
             )
