@@ -6,10 +6,11 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
     ALLOWED_HOSTS=(list, []),
     DEBUG=(bool, False),
     EMAIL_BACKEND=(str, "FIXME: replace with anymail backend Issue #10"),
-    ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
+    SENTRY_ENABLED=(bool, True),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "journal.accounts",
     "journal.core",
     "journal.entries",
+    "journal.sentry",
 ]
 
 MIDDLEWARE = [
@@ -203,3 +205,8 @@ GRAPH_MODELS = {
     "rankdir": "BT",
     "output": "models.png",
 }
+
+# sentry-sdk
+
+SENTRY_ENABLED = env("SENTRY_ENABLED")
+SENTRY_DSN = env("SENTRY_DSN")
