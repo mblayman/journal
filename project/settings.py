@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     # Needed by default templates even though we're not using a social provider.
     "allauth.socialaccount",
     "django_extensions",
+    "simple_history",
     "journal.accounts",
     "journal.core",
     "journal.entries",

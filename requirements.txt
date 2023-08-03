@@ -29,6 +29,8 @@ django-environ==0.10.0
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
+django-simple-history==3.3.0
+    # via -r requirements.in
 gunicorn==20.1.0
     # via -r requirements.in
 idna==3.4
