@@ -9,7 +9,7 @@ env = environ.Env(
     ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
     ALLOWED_HOSTS=(list, []),
     DEBUG=(bool, False),
-    EMAIL_BACKEND=(str, "FIXME: replace with anymail backend Issue #10"),
+    EMAIL_BACKEND=(str, "anymail.backends.sendgrid.EmailBackend"),
     SENTRY_ENABLED=(bool, True),
 )
 environ.Env.read_env(BASE_DIR / ".env")
@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "allauth.account",
     # Needed by default templates even though we're not using a social provider.
     "allauth.socialaccount",
+    "anymail",
     "django_extensions",
     "simple_history",
     "journal.accounts",
@@ -124,7 +125,8 @@ LOGOUT_REDIRECT_URL = "/"
 # Email
 
 EMAIL_BACKEND = env("EMAIL_BACKEND")
-EMAIL_SENDGRID_REPLY_TO = env("EMAIL_SENDGRID_REPLY_TO")
+DEFAULT_FROM_FIELD = "noreply@journeyinbox.com"
+SERVER_EMAIL = "noreply@journeyinbox.com"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -198,6 +200,13 @@ ACCOUNT_USER_DISPLAY = lambda user: user.email  # noqa
 ACCOUNT_USERNAME_REQUIRED = False
 # ACCOUNT_USERNAME_VALIDATORS => default
 # SOCIALACCOUNT_* => default
+
+# django-anymail
+
+ANYMAIL = {
+    "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
+}
+EMAIL_SENDGRID_REPLY_TO = env("EMAIL_SENDGRID_REPLY_TO")
 
 # django-extensions
 

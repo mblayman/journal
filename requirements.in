@@ -1,5 +1,6 @@
 Django==4.2.1
 django-allauth==0.54.0
+django-anymail[sendgrid]==10.1
 django-environ==0.10.0
 django-extensions==3.2.3
 django-simple-history==3.3.0
