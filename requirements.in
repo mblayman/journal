@@ -1,3 +1,4 @@
+dj-database-url==2.1.0
 Django==4.2.1
 django-allauth==0.54.0
 django-anymail[sendgrid]==10.1
