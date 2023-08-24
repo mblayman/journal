@@ -1,4 +1,3 @@
-{% load humanize %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -8,7 +7,7 @@
   <body>
     <p>How are you? Reply to this prompt to update your journal.</p>
     {% if entry %}
-      <p>On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|naturalday }}), you wrote:</p>
+      <p>On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|timesince:today }}), you wrote:</p>
     
       {{ entry.body|linebreaks}}
     {% else %}
