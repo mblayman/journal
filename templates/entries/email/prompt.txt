@@ -1,6 +1,6 @@
-{% load humanize %}How are you? Reply to this prompt to update your journal.
+How are you? Reply to this prompt to update your journal.
 {% if entry %}
-On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|naturalday }}), you wrote:
+On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|timesince:today }}), you wrote:
 
 {{ entry.body }}
 {% else %}
