@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ALLOWED_HOSTS: '*'
+      ANYMAIL_WEBHOOK_SECRET: 'random16:random16'
       DATABASE_SSL_REQUIRE: 'off'
       EMAIL_SENDGRID_REPLY_TO: 'reply-to@fakesendgrid.com'
       SECRET_KEY: 'a secret to everybody'
