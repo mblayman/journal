@@ -8,6 +8,6 @@ from journal.core.views import index
 urlpatterns = [
     path("", index, name="index"),
     path("accounts/", include("allauth.urls")),
-    path("admin/", admin.site.urls),
+    path(f"{settings.ADMIN_URL_PATH_TOKEN}/admin/", admin.site.urls),
     path("anymail/", include("anymail.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

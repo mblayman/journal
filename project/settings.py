@@ -98,6 +98,9 @@ DATABASES = {
     )
 }
 
+# Admin
+
+ADMIN_URL_PATH_TOKEN = env("ADMIN_URL_PATH_TOKEN")
 
 # Auth
 

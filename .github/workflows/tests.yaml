@@ -8,6 +8,7 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-22.04
     env:
+      ADMIN_URL_PATH_TOKEN: 'token'
       ALLOWED_HOSTS: '*'
       ANYMAIL_WEBHOOK_SECRET: 'random16:random16'
       DATABASE_SSL_REQUIRE: 'off'
