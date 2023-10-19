@@ -19,9 +19,21 @@ def handle_inbound(
         print("message.stripped_text was")
         print(message.stripped_text)
 
+        print("message keys")
+        pprint(message.keys())
+
+        print("message parts")
+        for part in message.walk():
+            print(part)
+
         # Check event.esp_event
         print("ESP event was")
-        pprint(event.esp_event)
+        # pprint(event.esp_event)
+        if event.esp_event is not None:
+            for header in event.esp_event.headers():
+                print(header)
+
+            print(event.esp_event.body.decode())
 
         # when - It's Wednesday, Oct. 18, how are you? (2023-10-18)
         # user -
