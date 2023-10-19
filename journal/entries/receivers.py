@@ -12,28 +12,29 @@ def handle_inbound(
         # body - come from the message -
         # what field is it stored in? what is the format of that field?
         # message.text OR message.html OR maybe message.stripped_text
+
+        # message.text contains the plain text AND the prompt.
+        # We need to trim out the prompt.
+        # Idea: trim all lines after journal@email.journeyinbox.com appears.
+        # That's imperfect, but a reasonably safe solution.
+
         print("message.text was")
         print(message.text)
-        print("message.html was")
-        print(message.html)
-        print("message.stripped_text was")
-        print(message.stripped_text)
 
         print("message keys")
         pprint(message.keys())
 
-        print("message parts")
-        for part in message.walk():
-            print(part)
+        print("Message ID")
+        print(message["Message-ID"])
 
         # Check event.esp_event
         print("ESP event was")
         # pprint(event.esp_event)
-        # if event.esp_event is not None:
-        #     for header in event.esp_event.headers():
-        #         print(header)
-        #
-        #     print(event.esp_event.body.decode())
+        if event.esp_event is not None:
+            for header in event.esp_event.headers:
+                print(header)
+
+            print(event.esp_event.body.decode())
 
         # when - It's Wednesday, Oct. 18, how are you? (2023-10-18)
         # user -
