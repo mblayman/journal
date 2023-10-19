@@ -29,11 +29,11 @@ def handle_inbound(
         # Check event.esp_event
         print("ESP event was")
         # pprint(event.esp_event)
-        if event.esp_event is not None:
-            for header in event.esp_event.headers():
-                print(header)
-
-            print(event.esp_event.body.decode())
+        # if event.esp_event is not None:
+        #     for header in event.esp_event.headers():
+        #         print(header)
+        #
+        #     print(event.esp_event.body.decode())
 
         # when - It's Wednesday, Oct. 18, how are you? (2023-10-18)
         # user -
