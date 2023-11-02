@@ -35,3 +35,25 @@ class Entry(models.Model):
     )
 
     objects = EntryManager()
+
+
+class PromptManager(models.Manager):
+    """A manager to provide custom methods for Prompt."""
+
+    def exists_for(self, user, when):
+        """Check if a prompt exists for this user on this date."""
+        return self.get_queryset().filter(user=user, when=when).exists()
+
+
+class Prompt(models.Model):
+    """A record to track that a journal prompt was sent to a user"""
+
+    when = models.DateField()
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="prompts",
+    )
+    message_id = models.TextField()
+
+    objects = PromptManager()

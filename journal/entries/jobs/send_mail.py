@@ -5,7 +5,7 @@ from django_extensions.management.jobs import DailyJob
 
 from journal.accounts.models import Account
 
-from ..models import Entry
+from ..models import Entry, Prompt
 
 
 class Job(DailyJob):
@@ -16,6 +16,10 @@ class Job(DailyJob):
         accounts = Account.objects.active().select_related("user")
         today = timezone.localdate()
         for account in accounts:
+            if Prompt.objects.exists_for(account.user, today):
+                print(f"Prompt already exists for {account.id} on {today}")
+                continue
+
             context = {
                 "entry": Entry.objects.get_random_for(account.user),
                 "today": today,
@@ -33,11 +37,14 @@ class Job(DailyJob):
                 to=[account.user.email],
             )
             message.attach_alternative(html_message, "text/html")
-            message.metadata = {
-                "metadata_key": "metadata_value",
-                "entry_date": str(today),
-            }
-            print(message.metadata)
+            message.metadata = {"entry_date": str(today)}
             message.send()
-            print("Message ID was:")
-            print(message.anymail_status.message_id)
+            Prompt.objects.create(
+                user=account.user,
+                when=today,
+                # message_id is not nullable, but during the tests, the in-memory
+                # backend does not set a value. Accept empty string to avoid
+                # nasty mocking hacks.
+                message_id=message.anymail_status.message_id or "",
+            )
+            print(f"Prompt sent for {account.id}")
