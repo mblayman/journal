@@ -17,7 +17,7 @@ class Job(DailyJob):
         today = timezone.localdate()
         for account in accounts:
             if Prompt.objects.exists_for(account.user, today):
-                print(f"Prompt already exists for {account.id} on {today}")
+                print(f"Prompt already exists for {account.user.id} on {today}.")
                 continue
 
             context = {
@@ -47,4 +47,4 @@ class Job(DailyJob):
                 # nasty mocking hacks.
                 message_id=message.anymail_status.message_id or "",
             )
-            print(f"Prompt sent for {account.id}")
+            print(f"Prompt sent for {account.user.id}.")
