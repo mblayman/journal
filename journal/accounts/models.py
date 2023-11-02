@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_extensions.db.models import ActivatorModel
+from hashid_field import HashidAutoField
 from simple_history.models import HistoricalRecords
 
 
@@ -25,6 +27,7 @@ class Account(models.Model):
 
     ACTIVE_STATUSES = (Status.TRIALING, Status.ACTIVE, Status.EXEMPT)
 
+    id = HashidAutoField(primary_key=True, salt=f"account{settings.HASHID_FIELD_SALT}")
     user = models.OneToOneField(
         "accounts.User",
         on_delete=models.CASCADE,

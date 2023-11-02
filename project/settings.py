@@ -226,6 +226,10 @@ GRAPH_MODELS = {
     "output": "models.png",
 }
 
+# django-hashid-field
+
+HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
+
 # sentry-sdk
 
 SENTRY_ENABLED = env("SENTRY_ENABLED")
