@@ -21,7 +21,7 @@ class TestSendMailJob:
         mail = mailoutbox[0]
         assert mail.from_email == settings.EMAIL_SENDGRID_REPLY_TO
         assert mail.to == [user.email]
-        assert mail.subject == "It's Wednesday, Jul. 19. How are you?"
+        assert mail.subject == "It's Wednesday, Jul. 19, 2023. How are you?"
         assert entry.body in mail.body  # Test the text email.
         html_message = mail.alternatives[0][0]
         assert "<p>This is the entry.</p>\n\n<p>It has newlines.</p>" in html_message

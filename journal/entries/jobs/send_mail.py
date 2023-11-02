@@ -24,7 +24,7 @@ class Job(DailyJob):
             text_message = render_to_string("entries/email/prompt.txt", context)
             html_message = render_to_string("entries/email/prompt.html", context)
             message = AnymailMessage(
-                subject=f"It's {today:%A}, {today:%b}. {today:%-d}. How are you?",
+                subject=f"It's {today:%A}, {today:%b}. {today:%-d}, {today:%Y}. How are you?",
                 body=text_message,
                 from_email=settings.EMAIL_SENDGRID_REPLY_TO,
                 to=[account.user.email],

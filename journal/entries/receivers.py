@@ -1,4 +1,4 @@
-from pprint import pprint
+# from pprint import pprint
 from typing import Any
 
 from anymail.signals import AnymailInboundEvent
@@ -18,15 +18,6 @@ def handle_inbound(
         # Idea: trim all lines after journal@email.journeyinbox.com appears.
         # That's imperfect, but a reasonably safe solution.
 
-        print("message.text was")
-        print(message.text)
-
-        print("message keys")
-        pprint(message.keys())
-
-        print("Message ID")
-        print(message["Message-ID"])
-
         # Check event.esp_event
         print("ESP event was")
         # pprint(event.esp_event)
@@ -36,7 +27,7 @@ def handle_inbound(
 
             print(event.esp_event.body.decode())
 
-        # when - It's Wednesday, Oct. 18, how are you? (2023-10-18)
+        # when - It's Wednesday, Oct. 18, 2023, how are you? (2023-10-18)
         # user -
         # Option 1 - event.from_email - does this match some User in the db?
         # Option 2 - when the prompt email is sent, SendGrid gives a mail ID.
