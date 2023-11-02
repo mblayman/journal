@@ -1,5 +1,4 @@
 from anymail.message import AnymailMessage
-from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django_extensions.management.jobs import DailyJob
@@ -23,10 +22,14 @@ class Job(DailyJob):
             }
             text_message = render_to_string("entries/email/prompt.txt", context)
             html_message = render_to_string("entries/email/prompt.html", context)
+            from_email = (
+                '"JourneyInbox Journal" '
+                f"<journal.{account.id}@email.journeyinbox.com>"
+            )
             message = AnymailMessage(
                 subject=f"It's {today:%A}, {today:%b}. {today:%-d}, {today:%Y}. How are you?",
                 body=text_message,
-                from_email=settings.EMAIL_SENDGRID_REPLY_TO,
+                from_email=from_email,
                 to=[account.user.email],
             )
             message.attach_alternative(html_message, "text/html")
