@@ -17,8 +17,7 @@ def test_persists_entry():
     message = AnymailInboundMessage.construct(
         subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
         text="Text",
-        from_email='"JourneyInbox Journal" '
-        f"<journal.{account.id}@email.journeyinbox.com>",
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
     )
     event = AnymailInboundEvent(event_type="inbound", message=message)
 
@@ -38,8 +37,7 @@ def test_rejects_bad_date():
     message = AnymailInboundMessage.construct(
         subject="RE: It's nothing. How are you?",
         text="Text",
-        from_email='"JourneyInbox Journal" '
-        f"<journal.{account.id}@email.journeyinbox.com>",
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
     )
     event = AnymailInboundEvent(event_type="inbound", message=message)
 
@@ -54,7 +52,7 @@ def test_rejects_bad_account():
     message = AnymailInboundMessage.construct(
         subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
         text="Text",
-        from_email='"JourneyInbox Journal" <journal.abcdefg@email.journeyinbox.com>',
+        to='"JourneyInbox Journal" <journal.abcdefg@email.journeyinbox.com>',
     )
     event = AnymailInboundEvent(event_type="inbound", message=message)
 
@@ -63,13 +61,13 @@ def test_rejects_bad_account():
     assert Entry.objects.count() == 0
 
 
-def test_rejects_non_account_from_email():
-    """When the from_email doesn't look like it holds an account ID, ignore it."""
+def test_rejects_non_account_to_email():
+    """When the to_email doesn't look like it holds an account ID, ignore it."""
     sender = None
     message = AnymailInboundMessage.construct(
         subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
         text="Text",
-        from_email='"JourneyInbox Journal" <help@email.journeyinbox.com>',
+        to='"JourneyInbox Journal" <help@email.journeyinbox.com>',
     )
     event = AnymailInboundEvent(event_type="inbound", message=message)
 
@@ -85,8 +83,7 @@ def test_rejects_inactive_account():
     message = AnymailInboundMessage.construct(
         subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
         text="Text",
-        from_email='"JourneyInbox Journal" '
-        f"<journal.{account.id}@email.journeyinbox.com>",
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
     )
     event = AnymailInboundEvent(event_type="inbound", message=message)
 

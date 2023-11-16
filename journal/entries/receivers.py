@@ -24,7 +24,7 @@ def handle_inbound(
         print("Bad date parse")
         return None
 
-    username = message.from_email.username
+    username = message.to[0].username
     if "." not in username:
         print("Username missing period.")
         return None
