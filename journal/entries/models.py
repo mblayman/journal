@@ -16,7 +16,7 @@ class EntryManager(models.Manager):
         if count == 0:
             return None
 
-        index = random.choice(range(0, count))
+        index = random.choice(range(0, count))  # noqa: S311
         return queryset[index]
 
 

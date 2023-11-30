@@ -1,5 +1,5 @@
-[tool.bandit]
-skips = ["B101", "B311"]
+[project]
+requires-python = ">=3.11"
 
 [tool.coverage.report]
 fail_under = 100
@@ -8,36 +8,6 @@ omit = [
 ]
 show_missing = true
 skip_covered = true
-
-[tool.isort]
-profile = "black"
-src_paths = ["journal"]
-
-# [tool.mypy]
-# check_untyped_defs = true
-#
-# [[tool.mypy.overrides]]
-# module = [
-#     "allauth.account.models",
-#     "allauth.account.signals",
-#     "allauth.socialaccount.models",
-#     "dj_database_url",
-#     "django.*",
-#     "django_extensions.*",
-#     "djstripe.*",
-#     "environ",
-#     "factory",
-#     "hashid_field.*",
-#     "ordered_model.*",
-#     "responses",
-#     "simple_history.*",
-#     "stripe",
-#     "test_plus.test",
-#     "waffle.*",
-#     "weasyprint",
-#     "whitenoise.middleware",
-# ]
-# ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "--nomigrations --disable-socket"
@@ -51,4 +21,27 @@ filterwarnings = [
 #    ignore:.*The providing_args argument is deprecated\..*:PendingDeprecationWarning
 testpaths = [
     "journal",
+]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    "W",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+ignore = [
+    # bandit: Use of `assert` detected
+    "S101",
 ]
