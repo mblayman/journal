@@ -100,3 +100,44 @@ def test_missing_message():
     handle_inbound(sender, event, "SendGrid")
 
     assert Entry.objects.count() == 0
+
+
+def test_parse_message_text():
+    """The message text excludes the prompt information."""
+    account = AccountFactory()
+    sender = None
+    text = "Did we make it?\r\n\r\nThis is a second line.\r\n\r\nOn Wed, Nov 15, 2023, 11:11 PM JourneyInbox Journal <\r\njournal.abcdef@email.journeyinbox.com> wrote:\r\n\r\n> How are you? Reply to this prompt to update your journal.\r\n>\r\n> You have no entries yet! As soon as you do, a random previous entry will\r\n> appear in your prompt.\r\n>\r\n>\r\n"  # noqa
+    message = AnymailInboundMessage.construct(
+        subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
+        text=text,
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
+    )
+    event = AnymailInboundEvent(event_type="inbound", message=message)
+
+    handle_inbound(sender, event, "SendGrid")
+
+    assert Entry.objects.count() == 1
+    entry = Entry.objects.first()
+    assert entry.body == "Did we make it?\n\nThis is a second line."
+
+
+def test_parse_message_text_missing_marker():
+    """When the prompt boundary marker is missing, all text is included."""
+    account = AccountFactory()
+    sender = None
+    text = "Did we make it?\r\n\r\nThis is a second line.\r\n\r\nOn Wed, Nov 15, 2023, 11:11 PM JourneyInbox\r\nJournal <\r\njournal.abcdef@email.journeyinbox.com> wrote:\r\n\r\n> How are you? Reply to this prompt to update your journal.\r\n>\r\n> You have no entries yet! As soon as you do, a random previous entry will\r\n> appear in your prompt.\r\n>\r\n>\r\n"  # noqa
+    message = AnymailInboundMessage.construct(
+        subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
+        text=text,
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
+    )
+    event = AnymailInboundEvent(event_type="inbound", message=message)
+
+    handle_inbound(sender, event, "SendGrid")
+
+    assert Entry.objects.count() == 1
+    entry = Entry.objects.first()
+    assert (
+        entry.body
+        == """Did we make it?\n\nThis is a second line.\n\nOn Wed, Nov 15, 2023, 11:11 PM JourneyInbox\nJournal <\njournal.abcdef@email.journeyinbox.com> wrote:\n\n> How are you? Reply to this prompt to update your journal.\n>\n> You have no entries yet! As soon as you do, a random previous entry will\n> appear in your prompt.\n>\n>"""  # noqa
+    )

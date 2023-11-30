@@ -16,7 +16,7 @@ def handle_inbound(
         print("No message")
         return None
 
-    # TODO: parse message.text to remove prompt text
+    body = parse_body(message.text)
 
     try:
         entry_datetime = parse(message.subject, fuzzy_with_tokens=True)[0]  # type: ignore
@@ -37,7 +37,26 @@ def handle_inbound(
         return None
 
     Entry.objects.create(
-        body=message.text,
+        body=body,
         when=entry_datetime.date(),
         user=account.user,
     )
+
+
+def parse_body(message_text: str) -> str:
+    """Parse the body out of the message text and strip off the prompt."""
+    lines = message_text.splitlines()
+    marker_line_index = 0
+    marker_found = False
+    for index, line in enumerate(lines):
+        if "JourneyInbox Journal" not in line:
+            continue
+        marker_line_index = index
+        marker_found = True
+        break
+
+    if marker_found:
+        lines = lines[:marker_line_index]
+
+    body = "\n".join(lines)
+    return body.rstrip("\n")
