@@ -161,3 +161,7 @@ cython_debug/
 #.idea/
 
 models.png
+
+# JavaScript
+node_modules
+static/site.css
