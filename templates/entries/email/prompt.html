@@ -7,7 +7,7 @@
   <body>
     <p>Reply to this prompt to update your journal.</p>
     {% if entry %}
-      <p>On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|timesince:today }}), you wrote:</p>
+      <p>On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|timesince:today }} ago), you wrote:</p>
     
       {{ entry.body|linebreaks}}
     {% else %}
