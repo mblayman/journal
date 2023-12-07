@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "tailwindcss build -i frontend/input.css -c frontend/tailwind.config.js -o static/site.css",
+    "build": "tailwindcss build -i frontend/input.css -c frontend/tailwind.config.js -o static/site.css --minify",
     "watch": "tailwindcss build -i frontend/input.css -c frontend/tailwind.config.js -o static/site.css --watch"
   },
   "devDependencies": {
