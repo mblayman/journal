@@ -10,3 +10,4 @@ gunicorn==20.1.0
 psycopg[binary]==3.1.10
 python-dateutil==2.8.2
 sentry-sdk==1.28.1
+whitenoise[brotli]==6.6.0

@@ -6,6 +6,8 @@
 #
 asgiref==3.6.0
     # via django
+brotli==1.1.0
+    # via whitenoise
 certifi==2023.5.7
     # via
     #   requests
@@ -82,6 +84,8 @@ urllib3==2.0.2
     #   django-anymail
     #   requests
     #   sentry-sdk
+whitenoise[brotli]==6.6.0
+    # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
