@@ -30,6 +30,7 @@ django==4.2.1
     #   django-anymail
     #   django-extensions
     #   django-hashid-field
+    #   django-waffle
 django-allauth==0.54.0
     # via -r requirements.in
 django-anymail[sendgrid]==10.1
@@ -41,6 +42,8 @@ django-extensions==3.2.3
 django-hashid-field==3.3.7
     # via -r requirements.in
 django-simple-history==3.3.0
+    # via -r requirements.in
+django-waffle==4.1.0
     # via -r requirements.in
 gunicorn==20.1.0
     # via -r requirements.in

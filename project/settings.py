@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "anymail",
     "django_extensions",
     "simple_history",
+    "waffle",
     "journal.accounts",
     "journal.core",
     "journal.entries",
@@ -56,6 +57,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "waffle.middleware.WaffleMiddleware",
 ]
 
 ROOT_URLCONF = "project.urls"
@@ -234,6 +236,10 @@ GRAPH_MODELS = {
 # django-hashid-field
 
 HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
+
+# django-waffle
+
+WAFFLE_CREATE_MISSING_FLAGS = True
 
 # sentry-sdk
 
