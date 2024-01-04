@@ -12,3 +12,9 @@ def terms(request: HttpRequest) -> HttpResponse:
     """The terms of service"""
     context = {}
     return render(request, "core/terms.html", context)
+
+
+def privacy(request: HttpRequest) -> HttpResponse:
+    """The privacy policy"""
+    context = {}
+    return render(request, "core/privacy.html", context)
