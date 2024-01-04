@@ -11,4 +11,5 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path(f"{settings.ADMIN_URL_PATH_TOKEN}/admin/", admin.site.urls),
     path("anymail/", include("anymail.urls")),
+    path("stripe/", include("djstripe.urls", namespace="djstripe")),
 ]

@@ -17,6 +17,7 @@ env = environ.Env(
     SECURE_SSL_REDIRECT=(bool, True),
     SENTRY_ENABLED=(bool, True),
     SESSION_COOKIE_SECURE=(bool, True),
+    STRIPE_LIVE_MODE=(bool, True),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "anymail",
     "django_extensions",
+    "djstripe",
     "simple_history",
     "waffle",
     "journal.accounts",
@@ -172,6 +174,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Sites
 
 SITE_ID = 1
+
+# dj-stripe
+
+STRIPE_LIVE_MODE = env("STRIPE_LIVE_MODE")
+DJSTRIPE_WEBHOOK_SECRET = env("DJSTRIPE_WEBHOOK_SECRET")
+# This setting is recommended in the dj-stripe docs as the best default.
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
+# This setting is recommended in the dj-stripe docs as the best default.
+DJSTRIPE_USE_NATIVE_JSONFIELD = True
 
 # django-allauth
 
