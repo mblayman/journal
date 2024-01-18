@@ -5,7 +5,10 @@ from django.shortcuts import render
 def index(request: HttpRequest) -> HttpResponse:
     """The entry point for the website."""
     context = {}
-    return render(request, "core/index.html", context)
+    template_name = "core/index_unauthenticated.html"
+    if request.user.is_authenticated:
+        template_name = "core/index.html"
+    return render(request, template_name, context)
 
 
 def terms(request: HttpRequest) -> HttpResponse:

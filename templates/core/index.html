@@ -1,8 +1,9 @@
-{% load static %}
-<html>
-  <head>
-    <link rel="stylesheet" href="{% static "site.css" %}">
-  </head>
-  <body>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  {% if user.account.status == user.account.Status.TRIALING %}
+    <button class="p-2 bg-lime-800 text-white">Activate Your Account</button>
+  {% endif %}
+{% endblock %}
