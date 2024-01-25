@@ -4,6 +4,40 @@
 
 {% block content %}
   {% if user.account.status == user.account.Status.TRIALING %}
-    <button class="p-2 bg-lime-800 text-white">Activate Your Account</button>
+    <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
   {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    var monthlyPrice = '{{ monthly_price.id }}';
+    var publishableKey = '{{ payments_publishable_key }}';
+
+    var createCheckoutSession = function (priceId) {
+      return fetch("{% url 'create_checkout_session' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+          price_id: priceId
+        })
+      }).then(function(result) {
+        return result.json();
+      });
+    };
+
+    var stripe = Stripe(publishableKey);
+
+    document
+      .getElementById("activate-button")
+      .addEventListener("click", function(evt) {
+        evt.preventDefault();
+        createCheckoutSession(monthlyPrice).then(function(data) {
+          stripe.redirectToCheckout({sessionId: data.session_id});
+        });
+      });
+  </script>
 {% endblock %}
