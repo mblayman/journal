@@ -11,7 +11,7 @@
 {% block scripts %}
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    var monthlyPrice = '{{ monthly_price.id }}';
+    var price = '{{ price.id }}';
     var publishableKey = '{{ payments_publishable_key }}';
 
     var createCheckoutSession = function (priceId) {
@@ -35,7 +35,7 @@
       .getElementById("activate-button")
       .addEventListener("click", function(evt) {
         evt.preventDefault();
-        createCheckoutSession(monthlyPrice).then(function(data) {
+        createCheckoutSession(price).then(function(data) {
           stripe.redirectToCheckout({sessionId: data.session_id});
         });
       });

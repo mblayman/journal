@@ -183,6 +183,7 @@ DJSTRIPE_WEBHOOK_SECRET = env("DJSTRIPE_WEBHOOK_SECRET")
 DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
 # This setting is recommended in the dj-stripe docs as the best default.
 DJSTRIPE_USE_NATIVE_JSONFIELD = True
+PRICE_LOOKUP_KEY = "monthly-v1"
 
 # django-allauth
 
