@@ -45,3 +45,19 @@ class TestCreateCheckoutSession:
         assert response.status_code == 200
         gateway.create_checkout_session.assert_called_with("1234", user)
         assert response.json()["session_id"] == "fake_session_id"
+
+
+class TestSuccess:
+    def test_unauthenticated(self, client):
+        """Only allow authenticated users."""
+        response = client.get(reverse("success"))
+
+        assert response.status_code == 302
+
+    def test_authenticated(self, client):
+        """An authenticated user gets a valid response."""
+        client.force_login(UserFactory())
+
+        response = client.get(reverse("success"))
+
+        assert response.status_code == 200

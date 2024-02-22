@@ -50,4 +50,6 @@ def test_create_checkout_session(mock_stripe):
     kwargs = mock_stripe.checkout.Session.create.call_args.kwargs
     assert kwargs["customer_email"] == user.email
     assert kwargs["client_reference_id"] == str(user.id)
+    assert kwargs["cancel_url"] == "https://example.com/"
+    assert kwargs["success_url"] == "https://example.com/success/"
     assert session_id == "fake_session_id"

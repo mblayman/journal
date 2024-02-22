@@ -2,6 +2,7 @@ import stripe
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.urls import reverse
 from djstripe.enums import APIKeyType
 from djstripe.models import APIKey, Price
 
@@ -33,13 +34,12 @@ class PaymentsGateway:
     def create_checkout_session(self, price_id: str, user: User) -> str:
         """Create a Stripe checkout session."""
         site = Site.objects.get_current()
-        # subscription_success = reverse("subscriptions:success")
-        # stripe_cancel = reverse("subscriptions:stripe_cancel")
+        success = reverse("success")
 
         session_parameters = {
             "customer_email": user.email,
-            "success_url": f"https://{site}",
-            "cancel_url": f"https://{site}",
+            "success_url": f"https://{site}{success}",
+            "cancel_url": f"https://{site}/",
             # TODO: Should we accept other payment methods? Issue #73
             "payment_method_types": ["card"],
             "mode": "subscription",
