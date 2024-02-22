@@ -9,6 +9,11 @@ omit = [
 show_missing = true
 skip_covered = true
 
+# I should replace this with ruff exclusively after updating my Neovim config.
+[tool.isort]
+profile = "black"
+src_paths = ["journal"]
+
 [tool.pytest.ini_options]
 addopts = "--nomigrations --disable-socket"
 DJANGO_SETTINGS_MODULE = "project.testing_settings"

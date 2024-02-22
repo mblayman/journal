@@ -40,7 +40,7 @@ class PaymentsGateway:
             "customer_email": user.email,
             "success_url": f"https://{site}",
             "cancel_url": f"https://{site}",
-            # TODO: Should we accept other payment methods?
+            # TODO: Should we accept other payment methods? Issue #73
             "payment_method_types": ["card"],
             "mode": "subscription",
             "line_items": [{"price": price_id, "quantity": 1}],
