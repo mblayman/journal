@@ -1,9 +1,11 @@
 import pytest
+from django.conf import settings
 from django.urls import reverse
 from djstripe.enums import APIKeyType
 from djstripe.models import APIKey
 
 from journal.accounts.tests.factories import UserFactory
+from journal.payments.tests.factories import PriceFactory
 
 
 @pytest.fixture
@@ -15,7 +17,12 @@ def publishable_key():
     )
 
 
-@pytest.mark.usefixtures("publishable_key")
+@pytest.fixture
+def price():
+    yield PriceFactory(lookup_key=settings.PRICE_LOOKUP_KEY)
+
+
+@pytest.mark.usefixtures("publishable_key", "price")
 class TestIndex:
     def test_unauthenticated(self, client):
         """An unauthenticated user gets a valid response."""
