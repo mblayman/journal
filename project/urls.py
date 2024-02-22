@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-from journal.accounts.views import create_checkout_session
+from journal.accounts.views import create_checkout_session, success
 from journal.core.views import index, privacy, terms
 
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
     path("privacy/", privacy, name="privacy"),
     path("terms/", terms, name="terms"),
     path("accounts/", include("allauth.urls")),
+    path("success/", success, name="success"),
     path(
         "accounts/create-checkout-session/",
         create_checkout_session,

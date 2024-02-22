@@ -1,5 +1,6 @@
 import factory
 from django.db.models.signals import post_save
+from djstripe.models import Event
 
 
 @factory.django.mute_signals(post_save)
@@ -8,6 +9,14 @@ class AccountFactory(factory.django.DjangoModelFactory):
         model = "accounts.Account"
 
     user = factory.SubFactory("journal.accounts.tests.factories.UserFactory")
+
+
+class EventFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Event
+
+    id = factory.Sequence(lambda n: f"evt_{n}")
+    data = factory.LazyFunction(lambda: {})
 
 
 class UserFactory(factory.django.DjangoModelFactory):

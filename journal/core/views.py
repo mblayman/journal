@@ -9,6 +9,7 @@ def index(request: HttpRequest) -> HttpResponse:
     payments_gateway = PaymentsGateway()
     context = {
         "payments_publishable_key": payments_gateway.publishable_key,
+        "price": payments_gateway.price,
     }
     template_name = "core/index_unauthenticated.html"
     if request.user.is_authenticated:
