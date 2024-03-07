@@ -134,8 +134,8 @@ LOGOUT_REDIRECT_URL = "/"
 # Email
 
 EMAIL_BACKEND = env("EMAIL_BACKEND")
-DEFAULT_FROM_FIELD = "noreply@journeyinbox.com"
-SERVER_EMAIL = "noreply@journeyinbox.com"
+DEFAULT_FROM_FIELD = "noreply@email.journeyinbox.com"
+SERVER_EMAIL = "noreply@email.journeyinbox.com"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
