@@ -134,7 +134,7 @@ LOGOUT_REDIRECT_URL = "/"
 # Email
 
 EMAIL_BACKEND = env("EMAIL_BACKEND")
-DEFAULT_FROM_FIELD = "noreply@email.journeyinbox.com"
+DEFAULT_FROM_EMAIL = "noreply@email.journeyinbox.com"
 SERVER_EMAIL = "noreply@email.journeyinbox.com"
 
 # Internationalization
