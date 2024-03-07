@@ -187,7 +187,7 @@ PRICE_LOOKUP_KEY = "monthly-v1"
 
 # django-allauth
 
-# ACCOUNT_ADAPTER => default
+ACCOUNT_ADAPTER = "journal.accounts.adapter.AccountAdapter"
 # ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS => default
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True

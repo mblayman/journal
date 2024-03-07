@@ -15,6 +15,11 @@ class AccountManager(models.Manager):
         qs = self.get_queryset()
         return qs.filter(status__in=self.model.ACTIVE_STATUSES)
 
+    def trialing(self):
+        """Get all the active accounts."""
+        qs = self.get_queryset()
+        return qs.filter(status=self.model.Status.TRIALING)
+
 
 class Account(models.Model):
     """Account holds the user's state"""
