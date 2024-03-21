@@ -17,7 +17,9 @@ cffi==1.15.1
 charset-normalizer==3.1.0
     # via requests
 cryptography==41.0.0
-    # via pyjwt
+    # via
+    #   django-anymail
+    #   pyjwt
 defusedxml==0.7.1
     # via python3-openid
 dj-database-url==2.1.0
@@ -56,9 +58,9 @@ idna==3.4
     # via requests
 oauthlib==3.2.2
     # via requests-oauthlib
-psycopg[binary]==3.1.10
+psycopg[binary]==3.1.18
     # via -r requirements.in
-psycopg-binary==3.1.10
+psycopg-binary==3.1.18
     # via psycopg
 pycparser==2.21
     # via cffi
