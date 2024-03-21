@@ -36,10 +36,10 @@ def handle_inbound(
         print(f"No active account ID: {account_id}")
         return None
 
-    Entry.objects.create(
-        body=body,
+    Entry.objects.update_or_create(
         when=entry_datetime.date(),
         user=account.user,
+        defaults={"body": body},
     )
 
 

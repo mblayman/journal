@@ -30,6 +30,34 @@ def test_persists_entry():
     assert entry.when == when
 
 
+def test_persists_one_entry():
+    """The entry is persisted one time and updated."""
+    account = AccountFactory()
+    sender = None
+
+    # Initial creation
+    message = AnymailInboundMessage.construct(
+        subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
+        text="Text",
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
+    )
+    event = AnymailInboundEvent(event_type="inbound", message=message)
+    handle_inbound(sender, event, "SendGrid")
+
+    # Updated entry
+    message = AnymailInboundMessage.construct(
+        subject="RE: It's Wednesday, Nov. 15, 2023. How are you?",
+        text="Text Updated",
+        to=f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>',
+    )
+    event = AnymailInboundEvent(event_type="inbound", message=message)
+    handle_inbound(sender, event, "SendGrid")
+
+    assert Entry.objects.count() == 1
+    entry = Entry.objects.first()
+    assert entry.body == "Text Updated"
+
+
 def test_rejects_bad_date():
     """A malformed date in the subject is ignored."""
     account = AccountFactory()
