@@ -11,8 +11,8 @@ def traces_sampler(sampling_context):  # pragma: no cover
     of transactions in a week. I don't care about that page right now,
     so ignore it.
     """
-    path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO", "")
-    if path == "/":
+    path: str = sampling_context.get("wsgi_environ", {}).get("PATH_INFO", "")
+    if path == "/" or path.endswith(".php") or path.endswith(".php7"):
         return 0
 
     return 1.0
