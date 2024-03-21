@@ -27,7 +27,7 @@ class Entry(models.Model):
         verbose_name_plural = "entries"
 
     body = models.TextField()
-    when = models.DateField()
+    when = models.DateField(db_index=True)
     user = models.ForeignKey(
         "accounts.User",
         on_delete=models.CASCADE,
