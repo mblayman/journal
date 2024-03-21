@@ -1,6 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
+from journal.accounts import constants
 from journal.payments.gateway import PaymentsGateway
 
 
@@ -10,6 +11,7 @@ def index(request: HttpRequest) -> HttpResponse:
     context = {
         "payments_publishable_key": payments_gateway.publishable_key,
         "price": payments_gateway.price,
+        "trial_days": constants.TRIAL_DAYS,
     }
     template_name = "core/index_unauthenticated.html"
     if request.user.is_authenticated:

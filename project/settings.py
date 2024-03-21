@@ -154,6 +154,12 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
 SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
 
+SILENCED_SYSTEM_CHECKS: list[str] = [
+    # STRIPE_TEST_SECRET_KEY and STRIPE_LIVE_SECRET_KEY settings exist
+    # and djstripe wants them not to exist.
+    "djstripe.I002",
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
