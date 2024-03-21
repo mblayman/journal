@@ -17,4 +17,4 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Account)
 class AccountAdmin(SimpleHistoryAdmin):
-    pass
+    list_display = ["id", "user"]

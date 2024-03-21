@@ -20,6 +20,11 @@ class AccountManager(models.Manager):
         qs = self.get_queryset()
         return qs.filter(status=self.model.Status.TRIALING)
 
+    def promptable(self):
+        """Get all the accounts that can receive prompts."""
+        active = self.active()
+        return active.filter(user__emailaddress__verified=True)
+
 
 class Account(models.Model):
     """Account holds the user's state"""

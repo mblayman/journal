@@ -1,4 +1,5 @@
 import factory
+from allauth.account.models import EmailAddress
 from django.db.models.signals import post_save
 from djstripe.models import Event
 
@@ -25,3 +26,12 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     email = factory.Sequence(lambda n: f"user_{n}@testing.com")
     username = factory.Sequence(lambda n: f"user_{n}")
+
+
+class EmailAddressFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailAddress
+
+    email = factory.Sequence(lambda n: f"user_{n}@testing.com")
+    user = factory.SubFactory("journal.accounts.tests.factories.UserFactory")
+    verified = True

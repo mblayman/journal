@@ -13,7 +13,7 @@ class Job(DailyJob):
 
     def execute(self):
         print("Sending prompts to active accounts")
-        accounts = Account.objects.active().select_related("user")
+        accounts = Account.objects.promptable().select_related("user")
         today = timezone.localdate()
         for account in accounts:
             if Prompt.objects.exists_for(account.user, today):

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Your Email Address{% endblock %}
+
+{% block content %}
+  <div class="max-w-xl">
+
+    <h1 class="font-extralight text-2xl text-lime-800 mb-4">Please Check Your Email!</h1>
+    <p class="mb-6">
+      We sent you an email so we can confirm your address
+      to complete your sign up.
+      Please follow the link in your email.
+      JourneyInbox will not send daily prompts until your verify your address.
+    </p>
+    <p class="mb-6">
+      Regards,<br>
+      Matt,<br>
+      JourneyInbox creator
+    </p>
+    <p class="text-sm text-gray-600">
+      P.S. If you can’t find the confirmation email
+      after a few minutes,
+      be sure to check your spam folder
+      as some email clients will mark your confirmation as spam.
+    </p>
+  </div>
+{% endblock %}
