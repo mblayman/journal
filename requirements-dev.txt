@@ -1,4 +1,4 @@
-factory-boy==3.2.1
+factory-boy==3.3.0
 pip-tools
 pre-commit
 pygraphviz==1.11
