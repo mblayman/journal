@@ -8,11 +8,13 @@
     <p class="mb-2">Welcome to JourneyInbox. I am still working on the user interface,
     but you should be receiving emails if your trial is active.</p>
     <p class="mb-2">Thanks for using JourneyInbox! Please message me on X at <a href="https://twitter.com/mblayman" class="underline text-lime-900 hover:brightness-150" target="_blank">@mblayman</a> if you have questions.</p>
-    <p>Matt Layman,<br>JourneyInbox creator</p>
+    <p class="mb-8">Matt Layman,<br>JourneyInbox creator</p>
+
+    {% if user.account.status == user.account.Status.TRIALING %}
+      <p class="mb-4">Your account is currently trialing. To continue using JourneyInbox beyond your trial, please activate your account.</p>
+      <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
+    {% endif %}
   </div>
-  {% if user.account.status == user.account.Status.TRIALING %}
-    <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
-  {% endif %}
 {% endblock %}
 
 {% block scripts %}
