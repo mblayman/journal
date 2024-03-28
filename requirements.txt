@@ -5,7 +5,9 @@
 #    pip-compile --resolver=backtracking requirements.in
 #
 asgiref==3.6.0
-    # via django
+    # via
+    #   django
+    #   django-simple-history
 brotli==1.1.0
     # via whitenoise
 certifi==2023.5.7
@@ -46,7 +48,7 @@ django-extensions==3.2.3
     # via -r requirements.in
 django-hashid-field==3.3.7
     # via -r requirements.in
-django-simple-history==3.3.0
+django-simple-history==3.5.0
     # via -r requirements.in
 django-waffle==4.1.0
     # via -r requirements.in
