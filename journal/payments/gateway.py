@@ -1,10 +1,15 @@
+import datetime
+
 import stripe
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.urls import reverse
+from django.utils import timezone
 from djstripe.enums import APIKeyType
 from djstripe.models import APIKey, Price
+
+from journal.accounts.constants import TRIAL_DAYS
 
 
 class PaymentsGateway:
@@ -47,7 +52,30 @@ class PaymentsGateway:
             "client_reference_id": str(user.id),
         }
 
+        if self._is_trial_eligible(user):
+            # Be generous and include an extra two days.
+            # This also makes Stripe display nicer so if someone signs up
+            # on the same day with a credit card, it will show the full number
+            # of days on the trial.
+            trial_end = self._trial_end(user) + datetime.timedelta(days=2)
+            session_parameters["subscription_data"] = {
+                # Stripe expects a Unix timestamp in whole seconds.
+                "trial_end": int(trial_end.timestamp())
+            }
+
         checkout_session = stripe.checkout.Session.create(
             api_key=self.secret_key, **session_parameters
         )
         return checkout_session["id"]
+
+    def _is_trial_eligible(self, user: User) -> bool:
+        """Check if the account is eligible for Stripe's trial data.
+
+        The trial must end at least 48 hours in the future. See:
+        https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-subscription_data-trial_end
+        """
+        cutoff = timezone.now() + datetime.timedelta(days=2)
+        return self._trial_end(user) > cutoff
+
+    def _trial_end(self, user: User) -> datetime.datetime:
+        return user.date_joined + datetime.timedelta(days=TRIAL_DAYS)
