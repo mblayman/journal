@@ -12,8 +12,16 @@
 
     {% if user.account.status == user.account.Status.TRIALING %}
       <p class="mb-4">Your account is currently trialing. To continue using JourneyInbox beyond your trial, please activate your account.</p>
+    {% endif %}
+
+    {% if user.account.status == user.account.Status.TRIAL_EXPIRED %}
+      <p class="mb-4">Your trial has expired. To continue using JourneyInbox, please activate your account.</p>
+    {% endif %}
+
+    {% if user.account.status == user.account.Status.TRIALING or user.account.status == user.account.Status.TRIAL_EXPIRED %}
       <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
     {% endif %}
+
   </div>
 {% endblock %}
 
