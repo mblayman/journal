@@ -5,7 +5,7 @@ django-allauth==0.54.0
 django-anymail[sendgrid]==10.1
 django-environ==0.11.2
 django-extensions==3.2.3
-django-hashid-field==3.3.7
+django-hashid-field==3.4.0
 django-simple-history==3.5.0
 django-waffle==4.1.0
 gunicorn==21.2.0
