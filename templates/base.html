@@ -5,8 +5,8 @@
     <link rel="stylesheet" href="{% static "site.css" %}">
     <title>{% block title %}{% endblock %} &ndash; JourneyInbox</title>
   </head>
-  <body>
-    <div class="w-full bg-lime-800 text-white">
+  <body class="min-h-screen flex flex-col">
+    <header class="w-full bg-lime-800 text-white">
       <div class="container mx-auto flex items-center">
         <a href="{% url "index" %}" class="hover:brightness-110">
           <div class="bg-lime-800 px-2 py-4 text-xl font-black tracking-wider">
@@ -14,11 +14,25 @@
           </div>
         </a>
       </div>
-    </div>
-    <div class="container mx-auto pt-12">
+    </header>
+    <main class="container mx-auto pt-12 grow">
       {% block content %}
       {% endblock %}
-    </div>
+    </main>
+
+    <footer class="w-full mt-8 mx-auto text-center text-sm bg-lime-800 text-white flex flex-col sm:flex-row justify-center">
+      <span class="py-3 px-1">&copy; {% now "Y" %} Journey<span class="text-orange-300">Inbox</span></span>
+      {# <a href="{% url "core:about" %}" class="mx-1 hover:text-gray-900">About</a> #}
+      <a href="{% url "privacy" %}" class="py-3 px-1 bg-lime-800 hover:brightness-110">Privacy</a>
+      <a href="{% url "terms" %}" class="py-3 px-1 bg-lime-800 hover:brightness-110">Terms</a>
+      {% if user.is_authenticated %}
+        <form class="inline py-3 px-1 bg-lime-800 hover:brightness-110" method="POST" action="{% url 'account_logout' %}">
+          {% csrf_token %}
+          <button class="" type="submit">Log Out</button>
+        </form>
+      {% endif %}
+    </footer>
+
     {% block scripts %}{% endblock %}
   </body>
 </html>
