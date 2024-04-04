@@ -13,9 +13,24 @@
             Journey<span class="text-orange-300">Inbox</span>
           </div>
         </a>
+        <div class="grow"></div>
+        <a href="{% url "account_login" %}" class="hover:brightness-110">
+          <div class="bg-lime-800 px-2 py-4">
+            Log In
+          </div>
+        </a>
       </div>
     </header>
     <main class="container mx-auto pt-12 grow">
+
+      {% if messages %}
+      <ul class="flex flex-row mb-10 w-full">
+        {% for message in messages %}
+          <li class="bg-yellow-200 border border-yellow-300 text-lime-900 p-4 rounded-lg shadow-sm">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
       {% block content %}
       {% endblock %}
     </main>
