@@ -7,14 +7,11 @@
   <body>
     <p>Reply to this prompt to update your journal.</p>
     {% if entry %}
-      <p>On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ entry.when|timesince:today }} ago), you wrote:</p>
-    
+      <p>On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ delta }} ago), you wrote:</p>
+
       {{ entry.body|linebreaks}}
     {% else %}
       <p>You have no entries yet! As soon as you do, a random previous entry will appear in your prompt.</p>
     {% endif %}
-    <p></p>
   </body>
 </html>
-
-
