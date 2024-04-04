@@ -12,7 +12,12 @@ def traces_sampler(sampling_context):  # pragma: no cover
     so ignore it.
     """
     path: str = sampling_context.get("wsgi_environ", {}).get("PATH_INFO", "")
-    if path == "/" or path.endswith(".php") or path.endswith(".php7"):
+    if (
+        path == "/"
+        or path.endswith(".php")
+        or path.endswith(".php7")
+        or path.startswith("/wp-")
+    ):
         return 0
 
     return 1.0
