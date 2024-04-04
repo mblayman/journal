@@ -20,6 +20,8 @@ DJANGO_SETTINGS_MODULE = "project.testing_settings"
 filterwarnings = [
     # Enable warnings as errors.
     "error",
+    # This warning is coming from dj-stripe 2.8.3.
+    "ignore:.*The default scheme will be changed.*:PendingDeprecationWarning",
 ]
 # This warning is coming from dj-stripe 2.5.1 (Example)
 #    ignore:.*The providing_args argument is deprecated\..*:DeprecationWarning
