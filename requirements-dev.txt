@@ -4,7 +4,7 @@ pre-commit
 pygraphviz==1.12
 pytest-django
 pytest-cov==5.0.0
-pytest-socket==0.6.0
+pytest-socket==0.7.0
 pytest-xdist==3.5.0
 ruff==0.3.5
 time-machine==2.14.1
