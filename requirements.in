@@ -1,5 +1,5 @@
 dj-database-url==2.1.0
-dj-stripe==2.8.3
+dj-stripe==2.8.4
 Django==5.0.4
 django-allauth==0.61.1
 django-anymail[sendgrid]==10.3
