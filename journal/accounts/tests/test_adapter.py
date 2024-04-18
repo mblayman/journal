@@ -1,4 +1,5 @@
 from journal.accounts.adapter import AccountAdapter
+from journal.accounts.constants import MAX_TRIALING_USERS
 from journal.accounts.models import Account
 from journal.accounts.tests.factories import AccountFactory
 
@@ -12,7 +13,7 @@ def test_signup_open():
 
 def test_signup_closed():
     """When trials are below limit, signup is allowed."""
-    for _ in range(20):
+    for _ in range(MAX_TRIALING_USERS):
         AccountFactory(status=Account.Status.TRIALING)
 
     adapter = AccountAdapter()
