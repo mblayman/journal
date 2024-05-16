@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
 from djstripe.enums import APIKeyType
-from djstripe.models import APIKey, Price
+from djstripe.models import APIKey, Customer, Price
 
 from journal.accounts.constants import TRIAL_DAYS
 
@@ -79,3 +79,19 @@ class PaymentsGateway:
 
     def _trial_end(self, user: User) -> datetime.datetime:
         return user.date_joined + datetime.timedelta(days=TRIAL_DAYS)
+
+    def create_billing_portal_session(self, user: User) -> str:
+        """Create a billing portal session at Stripe.
+
+        This method assumes that there is an existing Stripe customer
+        for the account.
+        """
+        site = Site.objects.get_current()
+        return_url = reverse("settings")
+        customer = Customer.objects.get(email=user.email)
+        session = stripe.billing_portal.Session.create(
+            api_key=self.secret_key,
+            customer=customer.id,
+            return_url=f"https://{site}{return_url}",
+        )
+        return session.url

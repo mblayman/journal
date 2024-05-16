@@ -8,11 +8,33 @@
     {% if user.account.is_trialing %}
       <p>Activate your account on the home page.</p>
     {% elif user.account.status == user.account.Status.ACTIVE %}
-      <p class="mb-4">Your account information is managed in Stripe.
-        If you need to update your account status or payment information,
-        please follow the link below.
+      <p>
+        <a class="underline text-lime-900 hover:brightness-150" id="manage-billing" href="#">Manage Your Billing Information</a>
+      at the Stripe customer portal.
       </p>
-      <p><a href="#" class="underline text-lime-900 hover:brightness-150">Manage your account</a></p>
     {% endif %}
   </div>
+{% endblock %}
+
+{% block scripts %}
+  {% if user.account.status == user.account.Status.ACTIVE %}
+    <script>
+      document
+        .getElementById("manage-billing")
+        .addEventListener("click", function(evt) {
+          evt.preventDefault();
+          fetch("{% url 'create_billing_portal_session' %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}"
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              window.location.href = data.url;
+            });
+        });
+    </script>
+  {% endif %}
 {% endblock %}

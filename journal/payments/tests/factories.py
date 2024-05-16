@@ -1,5 +1,12 @@
 import factory
-from djstripe.models import Price, Product
+from djstripe.models import Customer, Price, Product
+
+
+class CustomerFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Customer
+
+    id = factory.Sequence(lambda n: f"cus_{n}")
 
 
 class ProductFactory(factory.django.DjangoModelFactory):

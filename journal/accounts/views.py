@@ -20,6 +20,15 @@ def create_checkout_session(request):
 
 
 @login_required
+@require_POST
+def create_billing_portal_session(request):
+    """Create a billing portal session for a customer."""
+    gateway = PaymentsGateway()
+    portal_url = gateway.create_billing_portal_session(request.user)
+    return JsonResponse({"url": portal_url})
+
+
+@login_required
 def account_settings(request):
     """Show the user's settings."""
     return render(request, "accounts/settings.html", {})

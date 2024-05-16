@@ -9,7 +9,7 @@ from djstripe.models import APIKey
 from journal.accounts.constants import TRIAL_DAYS
 from journal.accounts.tests.factories import UserFactory
 from journal.payments.gateway import PaymentsGateway
-from journal.payments.tests.factories import PriceFactory
+from journal.payments.tests.factories import CustomerFactory, PriceFactory
 
 
 def test_publishable_key():
@@ -82,3 +82,25 @@ def test_no_trial_in_stripe_limits(mock_stripe):
 
     kwargs = mock_stripe.checkout.Session.create.call_args.kwargs
     assert "subscription_data" not in kwargs
+
+
+@mock.patch("journal.payments.gateway.stripe")
+def test_create_billing_portal_session(mock_stripe):
+    """The gateway gets a valid billing session URL."""
+    APIKey.objects.create(
+        type=APIKeyType.secret,
+        livemode=settings.STRIPE_LIVE_MODE,
+        secret="pk_some_value",  # noqa
+    )
+    mock_session = mock.MagicMock()
+    mock_session.url = "portal_url"
+    mock_stripe.billing_portal.Session.create.return_value = mock_session
+    user = UserFactory()
+    customer = CustomerFactory(email=user.email)
+    gateway = PaymentsGateway()
+
+    portal_url = gateway.create_billing_portal_session(user)
+
+    kwargs = mock_stripe.billing_portal.Session.create.call_args.kwargs
+    assert kwargs["customer"] == customer.id
+    assert portal_url == "portal_url"
