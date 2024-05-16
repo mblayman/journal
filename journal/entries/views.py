@@ -3,10 +3,12 @@ import json
 from dateutil.parser import parse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpRequest, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Entry
 
 
+@csrf_exempt
 @login_required
 @user_passes_test(lambda user: user.is_staff)
 def import_entries(request: HttpRequest) -> HttpResponse:
