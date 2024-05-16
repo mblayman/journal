@@ -20,6 +20,12 @@ def create_checkout_session(request):
 
 
 @login_required
+def account_settings(request):
+    """Show the user's settings."""
+    return render(request, "accounts/settings.html", {})
+
+
+@login_required
 def success(request):
     """Show the success after account activation."""
     return render(request, "accounts/success.html", {})

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+  <div class="max-w-xl mb-4">
+    <h1 class="text-xl my-4">Settings</h1>
+    {% if user.account.is_trialing %}
+      <p>Activate your account on the home page.</p>
+    {% elif user.account.status == user.account.Status.ACTIVE %}
+      <p class="mb-4">Your account information is managed in Stripe.
+        If you need to update your account status or payment information,
+        please follow the link below.
+      </p>
+      <p><a href="#" class="underline text-lime-900 hover:brightness-150">Manage your account</a></p>
+    {% endif %}
+  </div>
+{% endblock %}

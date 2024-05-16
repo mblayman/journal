@@ -47,6 +47,16 @@ class TestCreateCheckoutSession:
         assert response.json()["session_id"] == "fake_session_id"
 
 
+class TestAccountSettings:
+    def test_authenticated(self, client):
+        """An authenticated user gets a valid response."""
+        client.force_login(UserFactory())
+
+        response = client.get(reverse("settings"))
+
+        assert response.status_code == 200
+
+
 class TestSuccess:
     def test_unauthenticated(self, client):
         """Only allow authenticated users."""

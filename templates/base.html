@@ -14,7 +14,13 @@
           </div>
         </a>
         <div class="grow"></div>
-        {% if not user.is_authenticated %}
+        {% if user.is_authenticated %}
+          <a href="{% url "settings" %}" class="hover:brightness-110">
+            <div class="bg-lime-800 px-2 py-4">
+              Settings
+            </div>
+          </a>
+        {% else %}
           <a href="{% url "account_login" %}" class="hover:brightness-110">
             <div class="bg-lime-800 px-2 py-4">
               Log In
