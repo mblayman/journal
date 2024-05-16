@@ -1,5 +1,5 @@
 [project]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [tool.coverage.report]
 fail_under = 100
