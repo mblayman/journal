@@ -1,3 +1,7 @@
+from datetime import timedelta
+
+from django.utils import timezone
+
 from journal.accounts.tests.factories import UserFactory
 from journal.entries.models import Entry
 from journal.entries.tests.factories import EntryFactory
@@ -14,9 +18,10 @@ class TestEntry:
 
     def test_get_random_for(self):
         """The manager can get a random entry."""
+        today = timezone.localdate()
         user = UserFactory()
-        entry_1 = EntryFactory(user=user)
-        entry_2 = EntryFactory(user=user)
+        entry_1 = EntryFactory(user=user, when=today)
+        entry_2 = EntryFactory(user=user, when=today + timedelta(days=1))
 
         entry = Entry.objects.get_random_for(user)
 

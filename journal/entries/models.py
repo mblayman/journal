@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 
 from journal.accounts.models import User
 
@@ -25,6 +26,9 @@ class Entry(models.Model):
 
     class Meta:
         verbose_name_plural = "entries"
+        constraints = [
+            UniqueConstraint(name="user_per_day", fields=["user", "when"]),
+        ]
 
     body = models.TextField()
     when = models.DateField(db_index=True)
