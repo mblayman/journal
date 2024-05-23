@@ -6,13 +6,16 @@
   <div class="max-w-xl mb-4">
     <h1 class="text-xl my-4">Settings</h1>
     {% if user.account.is_trialing %}
-      <p>Activate your account on the home page.</p>
+      <p class="mb-4">Activate your account on the home page.</p>
     {% elif user.account.status == user.account.Status.ACTIVE %}
-      <p>
+      <p class="mb-4">
         <a class="underline text-lime-900 hover:brightness-150" id="manage-billing" href="#">Manage Your Billing Information</a>
       at the Stripe customer portal.
       </p>
     {% endif %}
+    <p><a class="underline text-lime-900 hover:brightness-150"
+          href="{% url 'export_entries' %}">Export all your journal entries</a>
+    </p>
   </div>
 {% endblock %}
 

@@ -9,7 +9,7 @@ from journal.accounts.views import (
     success,
 )
 from journal.core.views import index, privacy, terms
-from journal.entries.views import import_entries
+from journal.entries.views import export_entries, import_entries
 
 urlpatterns = [
     path("", index, name="index"),
@@ -37,6 +37,7 @@ urlpatterns = [
     # Entries
     #
     path("import/", import_entries, name="import_entries"),
+    path("export/", export_entries, name="export_entries"),
     #
     # Third party routes
     #

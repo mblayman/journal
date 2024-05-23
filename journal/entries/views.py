@@ -2,7 +2,8 @@ import json
 
 from dateutil.parser import parse
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Entry
@@ -29,3 +30,19 @@ def import_entries(request: HttpRequest) -> HttpResponse:
     ]
     Entry.objects.bulk_create(entries)
     return HttpResponse(b"ok")
+
+
+@login_required
+def export_entries(request: HttpRequest) -> HttpResponse:
+    """Export all of a user's entries as a JSON file."""
+    entries = list(
+        Entry.objects.filter(user=request.user).order_by("when").values("body", "when")
+    )
+    # safe=False is ok here because we are passing a list. JsonResponse only
+    # wants dictionaries, but we know for certain the JSON spec allows for lists.
+    response = JsonResponse(data=entries, safe=False)
+    today = timezone.localdate()
+    response["Content-Disposition"] = (
+        f'attachment; filename="journeyinbox-{today}.json"'
+    )
+    return response
