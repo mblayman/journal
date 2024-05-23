@@ -2,12 +2,14 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static "site.css" %}">
     <title>{% block title %}{% endblock %} &ndash; JourneyInbox</title>
   </head>
   <body class="min-h-screen flex flex-col">
     <header class="w-full bg-lime-800 text-white">
-      <div class="container mx-auto flex items-center">
+      <div class="container mx-auto px-2 sm:px-0 flex items-center">
         <a href="{% url "index" %}" class="hover:brightness-110">
           <div class="bg-lime-800 px-2 py-4 text-xl font-black tracking-wider">
             Journey<span class="text-orange-300">Inbox</span>
@@ -29,7 +31,7 @@
         {% endif %}
       </div>
     </header>
-    <main class="container mx-auto pt-12 grow">
+    <main class="container mx-auto pt-12 px-4 sm:px-0 grow">
 
       {% if messages %}
       <ul class="flex flex-row mb-10 w-full">
