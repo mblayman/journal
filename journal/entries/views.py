@@ -1,7 +1,8 @@
 import json
 
 from dateutil.parser import parse
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -10,8 +11,7 @@ from .models import Entry
 
 
 @csrf_exempt
-@login_required
-@user_passes_test(lambda user: user.is_staff)
+@staff_member_required(login_url="account_login")
 def import_entries(request: HttpRequest) -> HttpResponse:
     """Create new entries from JSON data.
 
