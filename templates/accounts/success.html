@@ -3,6 +3,8 @@
 {% block title %}Thanks!{% endblock %}
 
 {% block content %}
-  <p class="mb-4">Your account is now active. Thank you for signing up.</p>
-  <p><a class="underline text-lime-900 hover:brightness-150" href="{% url "index" %}">Go back Home</a></p>
+  <div class="max-w-lg mx-auto">
+    <p class="mb-4">Your account is now active. Thank you for signing up.</p>
+    <p><a class="underline text-lime-900 hover:brightness-150" href="{% url "index" %}">Go back Home</a></p>
+  </div>
 {% endblock %}

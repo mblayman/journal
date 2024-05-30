@@ -4,33 +4,35 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-  <h1 class="text-xl my-4">Sign Up</h1>
-  <ul class="flex flex-row mb-4 w-full">
-    <li class="bg-yellow-200 border border-yellow-300 text-lime-900 p-4 rounded-lg shadow-sm">JourneyInbox is in public beta. There are <strong>{% available_trial_slots %}</strong> beta spaces open. Sign up now!</li>
-  </ul>
-  {% flag signup_flag %}
-    <form method="POST">
-      {% csrf_token %}
-      <div>
-        <label for="id_email" class="block mb-1">Email:</label>
-        <input class="border mb-2" name="email" id="id_email" type="email">
-      </div>
-      <div class="mb-4">
-        <label for="id_password" class="block mb-1">Password:</label>
-        <input class="border mb-2" name="password1" id="id_password" type="password">
-      </div>
-      <div>
-        <input class="p-2 bg-lime-800 text-white" type="submit" value="Sign Up">
-      </div>
-    </form>
-    <p class="text-xs text-muted mt-6 leading-snug">
-      By continuing,
-      you agree to JourneyInbox&rsquo;s
-      <a href="{% url "terms" %}" class="underline" target="_blank">Terms of Service</a> and
-      <a href="{% url "privacy" %}" class="underline" target="_blank">Privacy Policy</a>.
-    </p>
+  <div class="max-w-lg mx-auto">
+    <h1 class="text-xl my-4">Sign Up</h1>
+    <ul class="flex flex-row mb-4 w-full">
+      <li class="bg-yellow-200 border border-yellow-300 text-lime-900 p-4 rounded-lg shadow-sm">JourneyInbox is in public beta. There are <strong>{% available_trial_slots %}</strong> beta spaces open. Sign up now!</li>
+    </ul>
+    {% flag signup_flag %}
+      <form method="POST">
+        {% csrf_token %}
+        <div>
+          <label for="id_email" class="block mb-1">Email:</label>
+          <input class="border mb-2" name="email" id="id_email" type="email">
+        </div>
+        <div class="mb-4">
+          <label for="id_password" class="block mb-1">Password:</label>
+          <input class="border mb-2" name="password1" id="id_password" type="password">
+        </div>
+        <div>
+          <input class="p-2 bg-lime-800 text-white" type="submit" value="Sign Up">
+        </div>
+      </form>
+      <p class="text-xs text-muted mt-6 leading-snug">
+        By continuing,
+        you agree to JourneyInbox&rsquo;s
+        <a href="{% url "terms" %}" class="underline" target="_blank">Terms of Service</a> and
+        <a href="{% url "privacy" %}" class="underline" target="_blank">Privacy Policy</a>.
+      </p>
 
-  {% else %}
-    <p>Sorry, we are not accepting new sign ups right now.</p>
-  {% endflag %}
+    {% else %}
+      <p>Sorry, we are not accepting new sign ups right now.</p>
+    {% endflag %}
+  </div>
 {% endblock %}

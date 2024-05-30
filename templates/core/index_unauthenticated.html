@@ -3,7 +3,7 @@
 {% block title %}Track Your Journey{% endblock %}
 
 {% block content %}
-  <div class="max-w-xl mb-6">
+  <div class="max-w-xl mb-6 mx-auto">
     <p class="mb-3">Hello!</p>
     <p class="mb-3">Welcome to JourneyInbox. JourneyInbox is an online journaling service that works through email. We'll send you a daily prompt directly to your inbox
     and you update your journal by replying. It's that easy!
@@ -20,7 +20,7 @@
     for many months now.
     </p>
     <p class="mb-8">Matt Layman,<br>JourneyInbox creator</p>
-    <p class="text-gray-600">You can enjoy JourneyInbox for free for {{ trial_days }} days. No credit card required.</p>
+    <p class="text-gray-600 mb-6">You can enjoy JourneyInbox for free for {{ trial_days }} days. No credit card required.</p>
+    <a href="{% url "account_signup" %}" class="p-2 bg-lime-800 text-white">Sign Up</a>
   </div>
-  <a href="{% url "account_signup" %}" class="p-2 bg-lime-800 text-white">Sign Up</a>
 {% endblock %}
