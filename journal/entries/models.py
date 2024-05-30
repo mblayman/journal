@@ -20,6 +20,12 @@ class EntryManager(models.Manager):
         index = random.choice(range(0, count))  # noqa: S311
         return queryset[index]
 
+    def latest(self, user: User) -> models.QuerySet[Entry]:
+        """Get the latest entries for a user."""
+        queryset = self.get_queryset().filter(user=user)
+        # TODO: the limit could be customizable.
+        return queryset.order_by("-when")[:10]
+
 
 class Entry(models.Model):
     """An entry stores the user's writing for the day"""
