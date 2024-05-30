@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
 from journal.accounts import constants
+from journal.entries.models import Entry
 from journal.payments.gateway import PaymentsGateway
 
 
@@ -26,8 +27,11 @@ def index(request: HttpRequest) -> HttpResponse:
         "trial_days": constants.TRIAL_DAYS,
     }
     template_name = "core/index_unauthenticated.html"
+
     if request.user.is_authenticated:
         template_name = "core/index.html"
+        context["entries"] = Entry.objects.latest(request.user)
+
     return render(request, template_name, context)
 
 

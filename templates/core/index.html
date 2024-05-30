@@ -4,24 +4,31 @@
 
 {% block content %}
   <div class="max-w-xl mb-4 mx-auto">
-    <p class="mb-2">Hello!</p>
-    <p class="mb-2">Welcome to JourneyInbox. I am still working on the user interface,
-    but you should be receiving emails if your trial is active.</p>
-    <p class="mb-2">Thanks for using JourneyInbox! Please message me on X at <a href="https://x.com/mblayman" class="underline text-lime-900 hover:brightness-150" target="_blank">@mblayman</a> if you have questions.</p>
-    <p class="mb-8">Matt Layman,<br>JourneyInbox creator</p>
+    <div class="mb-12">
+      {% if user.account.status == user.account.Status.TRIALING %}
+        <p class="mb-4">Your account is currently trialing. To continue using JourneyInbox beyond your trial, please activate your account.</p>
+      {% endif %}
 
-    {% if user.account.status == user.account.Status.TRIALING %}
-      <p class="mb-4">Your account is currently trialing. To continue using JourneyInbox beyond your trial, please activate your account.</p>
+      {% if user.account.status == user.account.Status.TRIAL_EXPIRED %}
+        <p class="mb-4">Your trial has expired. To continue using JourneyInbox, please activate your account.</p>
+      {% endif %}
+
+      {% if user.account.status == user.account.Status.TRIALING or user.account.status == user.account.Status.TRIAL_EXPIRED %}
+        <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
+      {% endif %}
+    </div>
+
+    {% if entries %}
+      {% for entry in entries %}
+        <h2 class="text-lg my-4">{{ entry.when}}</h2>
+        <p class="mb-8">{{ entry.body|linebreaksbr }}<p>
+        {% if not forloop.last %}
+          <hr>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      TODO: No entries!
     {% endif %}
-
-    {% if user.account.status == user.account.Status.TRIAL_EXPIRED %}
-      <p class="mb-4">Your trial has expired. To continue using JourneyInbox, please activate your account.</p>
-    {% endif %}
-
-    {% if user.account.status == user.account.Status.TRIALING or user.account.status == user.account.Status.TRIAL_EXPIRED %}
-      <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
-    {% endif %}
-
   </div>
 {% endblock %}
 
