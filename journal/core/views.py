@@ -5,6 +5,12 @@ from journal.accounts import constants
 from journal.payments.gateway import PaymentsGateway
 
 
+def about(request: HttpRequest) -> HttpResponse:
+    """The about page... duh"""
+    context = {}
+    return render(request, "core/about.html", context)
+
+
 def index(request: HttpRequest) -> HttpResponse:
     """The entry point for the website."""
     payments_gateway = PaymentsGateway()

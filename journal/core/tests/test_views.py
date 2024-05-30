@@ -22,6 +22,14 @@ def price():
     yield PriceFactory(lookup_key=settings.PRICE_LOOKUP_KEY)
 
 
+class TestAbout:
+    def test_unauthenticated(self, client):
+        """An unauthenticated user gets a valid response."""
+        response = client.get(reverse("about"))
+
+        assert response.status_code == 200
+
+
 @pytest.mark.usefixtures("publishable_key", "price")
 class TestIndex:
     def test_unauthenticated(self, client):

@@ -47,11 +47,11 @@
 
     <footer class="w-full mt-8 mx-auto text-center text-sm bg-lime-800 text-white flex flex-col sm:flex-row justify-center">
       <span class="py-3 px-1">&copy; {% now "Y" %} Journey<span class="text-orange-300">Inbox</span></span>
-      {# <a href="{% url "core:about" %}" class="mx-1 hover:text-gray-900">About</a> #}
-      <a href="{% url "privacy" %}" class="py-3 px-1 bg-lime-800 hover:brightness-110">Privacy</a>
-      <a href="{% url "terms" %}" class="py-3 px-1 bg-lime-800 hover:brightness-110">Terms</a>
+      <a href="{% url "about" %}" class="py-3 px-2 bg-lime-800 hover:brightness-110">About</a>
+      <a href="{% url "privacy" %}" class="py-3 px-2 bg-lime-800 hover:brightness-110">Privacy</a>
+      <a href="{% url "terms" %}" class="py-3 px-2 bg-lime-800 hover:brightness-110">Terms</a>
       {% if user.is_authenticated %}
-        <form class="inline py-3 px-1 bg-lime-800 hover:brightness-110" method="POST" action="{% url 'account_logout' %}">
+        <form class="inline py-3 px-2 bg-lime-800 hover:brightness-110" method="POST" action="{% url 'account_logout' %}">
           {% csrf_token %}
           <button class="" type="submit">Log Out</button>
         </form>
