@@ -11,6 +11,12 @@ def about(request: HttpRequest) -> HttpResponse:
     return render(request, "core/about.html", context)
 
 
+def faq(request: HttpRequest) -> HttpResponse:
+    """Frequently Asked Questions"""
+    context = {}
+    return render(request, "core/faq.html", context)
+
+
 def index(request: HttpRequest) -> HttpResponse:
     """The entry point for the website."""
     payments_gateway = PaymentsGateway()

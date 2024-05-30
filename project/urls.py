@@ -8,12 +8,13 @@ from journal.accounts.views import (
     create_checkout_session,
     success,
 )
-from journal.core.views import about, index, privacy, terms
+from journal.core.views import about, faq, index, privacy, terms
 from journal.entries.views import export_entries, import_entries
 
 urlpatterns = [
     path("", index, name="index"),
     path("about/", about, name="about"),
+    path("faq/", faq, name="faq"),
     #
     # Boring legal stuff
     #

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ{% endblock %}
+
+{% block content %}
+  <div class="max-w-xl mb-4 mx-auto">
+    <h1 class="text-xl my-4 mb-8">Frequently Asked Questions (FAQ)</h1>
+
+    <h2 class="text-lg my-4">Who Makes JourneyInbox?</h2>
+
+    <p class="mb-8">
+      JourneyInbox is built by me, Matt Layman.
+      You can learn more about me and the service
+      on the
+      <a href="{% url "about" %}" class="underline text-lime-900 hover:brightness-150">about page</a>.
+    </p>
+
+    <h2 class="text-lg my-4">How Do I Take My Journal Out Of JourneyInbox?</h2>
+
+    {% if user.is_authenticated %}
+      <p class="mb-8">
+        While I'm sad to see you go,
+        I believe that your data belongs to you.
+        Because of that, JourneyInbox has an
+        <a href="{% url "export_entries" %}" class="underline text-lime-900 hover:brightness-150">export feature</a>
+        that lets you take your journal data
+        at any time.
+      </p>
+    {% else %}
+      <p class="mb-8">
+        While I'm sad to see you go,
+        I believe that your data belongs to you.
+        Because of that,
+        JourneyInbox has an export feature that lets you take your journal data
+        at any time.
+      </p>
+    {% endif %}
+
+  </div>
+{% endblock %}
