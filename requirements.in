@@ -7,7 +7,7 @@ django-debug-toolbar==4.4.2
 django-environ==0.11.2
 django-extensions==3.2.3
 django-hashid-field==3.4.1
-django-simple-history==3.6.0
+django-simple-history==3.7.0
 django-waffle==4.1.0
 gunicorn==22.0.0
 psycopg[binary]==3.1.19
