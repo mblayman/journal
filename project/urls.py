@@ -1,3 +1,4 @@
+from denied.decorators import allow
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
@@ -43,15 +44,17 @@ urlpatterns = [
     #
     # Third party routes
     #
-    path("accounts/", include("allauth.urls")),
-    path("anymail/", include("anymail.urls")),
-    path("stripe/", include("djstripe.urls", namespace="djstripe")),
+    path("accounts/", allow(include("allauth.urls"))),
+    path("anymail/", allow(include("anymail.urls"))),
+    path("stripe/", allow(include("djstripe.urls", namespace="djstripe"))),
     #
     # Admin
     #
-    path(f"{settings.ADMIN_URL_PATH_TOKEN}/admin/", admin.site.urls),
+    path(f"{settings.ADMIN_URL_PATH_TOKEN}/admin/", allow(admin.site.urls)),
 ]
 
 # Enable the debug toolbar only in DEBUG mode.
 if settings.DEBUG and settings.DEBUG_TOOLBAR:
-    urlpatterns = [path("__debug__/", include("debug_toolbar.urls"))] + urlpatterns
+    urlpatterns = [
+        path("__debug__/", allow(include("debug_toolbar.urls")))
+    ] + urlpatterns

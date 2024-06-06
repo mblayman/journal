@@ -1,7 +1,8 @@
 import json
 
 from dateutil.parser import parse
-from django.contrib.auth.decorators import login_required, user_passes_test
+from denied.authorizers import any_authorized, staff_authorized
+from denied.decorators import authorize
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -10,8 +11,7 @@ from .models import Entry
 
 
 @csrf_exempt
-@login_required
-@user_passes_test(lambda user: user.is_staff)
+@authorize(staff_authorized)
 def import_entries(request: HttpRequest) -> HttpResponse:
     """Create new entries from JSON data.
 
@@ -32,7 +32,7 @@ def import_entries(request: HttpRequest) -> HttpResponse:
     return HttpResponse(b"ok")
 
 
-@login_required
+@authorize(any_authorized)
 def export_entries(request: HttpRequest) -> HttpResponse:
     """Export all of a user's entries as a JSON file."""
     entries = list(

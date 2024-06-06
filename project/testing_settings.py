@@ -16,5 +16,7 @@ STORAGES = {
     },
 }
 
+MEDIA_URL = "/test_media"
+
 # This eliminates the warning about a missing staticfiles directory.
 WHITENOISE_AUTOREFRESH = True
