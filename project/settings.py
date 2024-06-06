@@ -12,6 +12,7 @@ env = environ.Env(
     DATABASE_CONN_MAX_AGE=(int, 600),
     DATABASE_SSL_REQUIRE=(bool, True),
     DEBUG=(bool, False),
+    DEBUG_TOOLBAR=(bool, False),
     EMAIL_BACKEND=(str, "anymail.backends.sendgrid.EmailBackend"),
     SECURE_HSTS_SECONDS=(int, 60 * 60 * 24 * 365),
     SECURE_SSL_REDIRECT=(bool, True),
@@ -23,6 +24,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
+DEBUG_TOOLBAR = env("DEBUG_TOOLBAR")
 ALLOWED_HOSTS: list[str] = env("ALLOWED_HOSTS")
 
 # Application definition
@@ -62,6 +64,12 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     "waffle.middleware.WaffleMiddleware",
 ]
+
+# Enable the debug toolbar only in DEBUG mode.
+if DEBUG and DEBUG_TOOLBAR:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    INTERNAL_IPS = ["127.0.0.1"]
 
 ROOT_URLCONF = "project.urls"
 

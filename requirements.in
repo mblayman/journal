@@ -3,6 +3,7 @@ dj-stripe==2.8.4
 Django==5.0.6
 django-allauth==0.63.2
 django-anymail[sendgrid]==10.3
+django-debug-toolbar==4.4.2
 django-environ==0.11.2
 django-extensions==3.2.3
 django-hashid-field==3.4.1
