@@ -67,7 +67,7 @@ requests==2.31.0
     # via
     #   django-anymail
     #   stripe
-sentry-sdk==2.4.0
+sentry-sdk==2.5.0
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil
