@@ -1,11 +1,22 @@
-# from pprint import pprint
 from typing import Any
 
 from anymail.signals import AnymailInboundEvent
 from dateutil.parser import ParserError, parse
+from django.http import HttpRequest
+from django.utils import timezone
 
 from journal.accounts.models import Account
 from journal.entries.models import Entry
+from journal.entries.transmitter import send_prompt
+
+
+def handle_email_confirmed(
+    sender: Any, request: HttpRequest, email_address: str, **kwargs: Any
+) -> None:
+    """Send a prompt to a user as soon as they confirm their email."""
+    account = Account.objects.from_email(email_address)
+    today = timezone.localdate()
+    send_prompt(account, today)
 
 
 def handle_inbound(

@@ -2,11 +2,23 @@ import datetime
 
 from anymail.inbound import AnymailInboundMessage
 from anymail.signals import AnymailInboundEvent
+from django.http import HttpRequest
 
 from journal.accounts.models import Account
-from journal.accounts.tests.factories import AccountFactory
-from journal.entries.models import Entry
-from journal.entries.receivers import handle_inbound
+from journal.accounts.tests.factories import AccountFactory, UserFactory
+from journal.entries.models import Entry, Prompt
+from journal.entries.receivers import handle_email_confirmed, handle_inbound
+
+
+def test_email_confirmed_sends_prompt():
+    """The email_confirmed signal handler sends a prompt."""
+    sender = None
+    request = HttpRequest()
+    user = UserFactory()
+
+    handle_email_confirmed(sender, request, user.email)
+
+    assert Prompt.objects.filter(user=user).exists()
 
 
 def test_persists_entry():

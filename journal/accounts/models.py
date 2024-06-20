@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -24,6 +26,10 @@ class AccountManager(models.Manager):
         """Get all the accounts that can receive prompts."""
         active = self.active()
         return active.filter(user__emailaddress__verified=True)
+
+    def from_email(self, email: str) -> Account:
+        qs = self.get_queryset()
+        return qs.filter(user__email=email).get()
 
 
 class Account(models.Model):
