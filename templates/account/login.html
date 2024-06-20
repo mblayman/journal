@@ -6,10 +6,10 @@
   <div class="max-w-lg mx-auto">
     <h1 class="text-xl my-4">Log In</h1>
 
-    <form class="login" method="POST" action="{% url "account_login" %}">
+    <form method="POST" action="{% url "account_login" %}">
       {% csrf_token %}
       <div>
-        <label for="id_email" class="block mb-1">Email:</label>
+        <label for="id_login" class="block mb-1">Email:</label>
         <input class="border mb-2" type="email" name="login" autocomplete="email" required id="id_login">
       </div>
 
