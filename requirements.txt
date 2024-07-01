@@ -57,9 +57,9 @@ idna==3.4
     # via requests
 packaging==24.0
     # via gunicorn
-psycopg[binary]==3.1.19
+psycopg[binary]==3.2.1
     # via -r requirements.in
-psycopg-binary==3.1.19
+psycopg-binary==3.2.1
     # via psycopg
 python-dateutil==2.9.0.post0
     # via -r requirements.in
