@@ -11,7 +11,7 @@ django-hashid-field==3.4.1
 django-simple-history==3.7.0
 django-waffle==4.1.0
 gunicorn==22.0.0
-psycopg[binary]==3.1.19
+psycopg[binary]==3.2.1
 python-dateutil==2.9.0.post0
 sentry-sdk==2.5.1
 whitenoise[brotli]==6.7.0
