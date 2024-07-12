@@ -86,5 +86,5 @@ urllib3==2.0.2
     #   django-anymail
     #   requests
     #   sentry-sdk
-whitenoise[brotli]==6.6.0
+whitenoise[brotli]==6.7.0
     # via -r requirements.in
