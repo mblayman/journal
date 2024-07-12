@@ -1,0 +1,57 @@
+{% if user.is_authenticated %}
+  {% if user.account.status == user.account.Status.TRIALING or user.account.status == user.account.Status.TRIAL_EXPIRED %}
+    <div class="max-w-xl flex flex-row mx-auto mb-10 w-full">
+      <div class="bg-stone-100 border-b-2 border-lime-600 p-4">
+
+      <div class="mb-4 text-lime-900">
+        {% if user.account.status == user.account.Status.TRIALING %}
+          <h1 class="font-light text-2xl tracking-wide mb-4">Your account is currently trialing.</h1>
+          <p class="text-stone-800">To continue using JourneyInbox beyond your trial, please activate your account.</p>
+        {% endif %}
+
+        {% if user.account.status == user.account.Status.TRIAL_EXPIRED %}
+          <h1 class="font-light text-2xl tracking-wide mb-4">Your trial has expired.</h1>
+          <p class="text-stone-800">To continue using JourneyInbox, please activate your account.</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
+      </div>
+
+      </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      var price = '{{ price.id }}';
+      var publishableKey = '{{ payments_publishable_key }}';
+
+      var createCheckoutSession = function (priceId) {
+        return fetch("{% url 'create_checkout_session' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: JSON.stringify({
+            price_id: priceId
+          })
+        }).then(function(result) {
+          return result.json();
+        });
+      };
+
+      var stripe = Stripe(publishableKey);
+
+      document
+        .getElementById("activate-button")
+        .addEventListener("click", function(evt) {
+          evt.preventDefault();
+          createCheckoutSession(price).then(function(data) {
+            stripe.redirectToCheckout({sessionId: data.session_id});
+          });
+        });
+    </script>
+  {% endif %}
+{% endif %}

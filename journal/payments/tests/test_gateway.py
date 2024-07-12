@@ -9,16 +9,14 @@ from djstripe.models import APIKey
 from journal.accounts.constants import TRIAL_DAYS
 from journal.accounts.tests.factories import UserFactory
 from journal.payments.gateway import PaymentsGateway
-from journal.payments.tests.factories import CustomerFactory, PriceFactory
+from journal.payments.tests.factories import CustomerFactory
 
 
 def test_publishable_key():
-    """The gateway can return a valid publishable secret."""
-    APIKey.objects.create(
-        type=APIKeyType.publishable,
-        livemode=settings.STRIPE_LIVE_MODE,
-        secret="pk_some_value",  # noqa
-    )
+    """The gateway can return a valid publishable secret.
+
+    The publishable key is global conftest data.
+    """
     gateway = PaymentsGateway()
 
     publishable_key = gateway.publishable_key
@@ -27,8 +25,10 @@ def test_publishable_key():
 
 
 def test_price():
-    """The gateway can return a valid price ID."""
-    PriceFactory(lookup_key=settings.PRICE_LOOKUP_KEY)
+    """The gateway can return a valid price ID.
+
+    The price is global conftest data.
+    """
     gateway = PaymentsGateway()
 
     price = gateway.price

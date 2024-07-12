@@ -9,54 +9,5 @@
     but you should be receiving emails if your trial is active.</p>
     <p class="mb-2">Thanks for using JourneyInbox! Please message me on X at <a href="https://x.com/mblayman" class="underline text-lime-900 hover:brightness-150" target="_blank">@mblayman</a> if you have questions.</p>
     <p class="mb-8">Matt Layman,<br>JourneyInbox creator</p>
-
-    {% if user.account.status == user.account.Status.TRIALING %}
-      <p class="mb-4">Your account is currently trialing. To continue using JourneyInbox beyond your trial, please activate your account.</p>
-    {% endif %}
-
-    {% if user.account.status == user.account.Status.TRIAL_EXPIRED %}
-      <p class="mb-4">Your trial has expired. To continue using JourneyInbox, please activate your account.</p>
-    {% endif %}
-
-    {% if user.account.status == user.account.Status.TRIALING or user.account.status == user.account.Status.TRIAL_EXPIRED %}
-      <button id="activate-button" class="p-2 bg-lime-800 text-white">Activate Your Account</button>
-    {% endif %}
-
   </div>
-{% endblock %}
-
-{% block scripts %}
-  {% if user.account.status == user.account.Status.TRIALING or user.account.status == user.account.Status.TRIAL_EXPIRED %}
-    <script src="https://js.stripe.com/v3/"></script>
-    <script>
-      var price = '{{ price.id }}';
-      var publishableKey = '{{ payments_publishable_key }}';
-
-      var createCheckoutSession = function (priceId) {
-        return fetch("{% url 'create_checkout_session' %}", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-          },
-          body: JSON.stringify({
-            price_id: priceId
-          })
-        }).then(function(result) {
-          return result.json();
-        });
-      };
-
-      var stripe = Stripe(publishableKey);
-
-      document
-        .getElementById("activate-button")
-        .addEventListener("click", function(evt) {
-          evt.preventDefault();
-          createCheckoutSession(price).then(function(data) {
-            stripe.redirectToCheckout({sessionId: data.session_id});
-          });
-        });
-    </script>
-  {% endif %}
 {% endblock %}

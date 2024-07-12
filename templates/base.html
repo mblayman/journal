@@ -1,4 +1,4 @@
-{% load static %}
+{% load accounts_tags static %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -40,6 +40,8 @@
         {% endfor %}
       </ul>
       {% endif %}
+
+      {% trial_banner %}
 
       {% block content %}
       {% endblock %}
