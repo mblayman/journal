@@ -31,7 +31,7 @@ django==5.0.6
     #   django-hashid-field
     #   django-simple-history
     #   django-waffle
-django-allauth==0.63.3
+django-allauth==0.63.6
     # via -r requirements.in
 django-anymail[sendgrid]==11.0
     # via -r requirements.in
