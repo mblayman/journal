@@ -7,4 +7,4 @@ pytest-cov==5.0.0
 pytest-socket==0.7.0
 pytest-xdist==3.6.1
 ruff==0.5.1
-time-machine==2.14.2
+time-machine==2.15.0
