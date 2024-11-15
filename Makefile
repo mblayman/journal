@@ -1,7 +1,7 @@
 .PHONY: local
 
 local:
-	heroku local -f Procfile.dev
+	uv run honcho start -f Procfile
 
 coverage:
 	uv run pytest --cov=journal --migrations -n 2 --dist loadfile
