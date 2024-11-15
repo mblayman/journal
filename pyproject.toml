@@ -16,7 +16,6 @@ dependencies = [
     "django-waffle==4.1.0",
     "django==5.0.7",
     "gunicorn==22.0.0",
-    "psycopg[binary]==3.2.1",
     "python-dateutil==2.9.0.post0",
     "sentry-sdk==2.9.0",
     "whitenoise[brotli]==6.7.0",
