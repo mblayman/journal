@@ -1,6 +1,8 @@
 version: 2
-updates:
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
+updates: []
+  # TODO: use dependabot when it support uv
+  # See https://github.com/dependabot/dependabot-core/issues/10039
+  # - package-ecosystem: "pip"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "daily"
