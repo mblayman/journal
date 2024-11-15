@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    # When in a "production" mode
+    # volumes:
+    #   - ./db.sqlite3:/app/db.sqlite3
+    env_file: ".env"
+    ports:
+      - 8000:8000
