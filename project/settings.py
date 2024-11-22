@@ -1,31 +1,17 @@
 from pathlib import Path
 
 import dj_database_url
-import environ
+import environs
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
-    ALLOWED_HOSTS=(list, []),
-    CSRF_COOKIE_SECURE=(bool, True),
-    DATABASE_CONN_MAX_AGE=(int, 600),
-    DATABASE_SSL_REQUIRE=(bool, True),
-    DEBUG=(bool, False),
-    DEBUG_TOOLBAR=(bool, False),
-    EMAIL_BACKEND=(str, "anymail.backends.sendgrid.EmailBackend"),
-    SECURE_HSTS_SECONDS=(int, 60 * 60 * 24 * 365),
-    SECURE_SSL_REDIRECT=(bool, True),
-    SENTRY_ENABLED=(bool, True),
-    SESSION_COOKIE_SECURE=(bool, True),
-    STRIPE_LIVE_MODE=(bool, True),
-)
-environ.Env.read_env(BASE_DIR / ".env")
+env = environs.Env()
+env.read_env()
 
 SECRET_KEY = env("SECRET_KEY")
-DEBUG = env("DEBUG")
-DEBUG_TOOLBAR = env("DEBUG_TOOLBAR")
-ALLOWED_HOSTS: list[str] = env("ALLOWED_HOSTS")
+DEBUG = env.bool("DEBUG", False)
+DEBUG_TOOLBAR = env.bool("DEBUG_TOOLBAR", False)
+ALLOWED_HOSTS: list[str] = env.list("ALLOWED_HOSTS", [])
 
 # Application definition
 
@@ -108,8 +94,8 @@ WSGI_APPLICATION = "project.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(
-        conn_max_age=env("DATABASE_CONN_MAX_AGE"),
-        ssl_require=env("DATABASE_SSL_REQUIRE"),
+        conn_max_age=env.int("DATABASE_CONN_MAX_AGE", 600),
+        ssl_require=env.bool("DATABASE_SSL_REQUIRE", True),
     )
 }
 
@@ -143,7 +129,7 @@ LOGOUT_REDIRECT_URL = "/"
 
 # Email
 
-EMAIL_BACKEND = env("EMAIL_BACKEND")
+EMAIL_BACKEND = env.str("EMAIL_BACKEND", "anymail.backends.sendgrid.EmailBackend")
 DEFAULT_FROM_EMAIL = "noreply@email.journeyinbox.com"
 SERVER_EMAIL = "noreply@email.journeyinbox.com"
 
@@ -156,13 +142,13 @@ USE_I18N = True
 USE_TZ = True
 
 # Security
-CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", True)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS")
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", 60 * 60 * 24 * 365)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
-SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", True)
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", True)
 
 SILENCED_SYSTEM_CHECKS: list[str] = [
     # STRIPE_TEST_SECRET_KEY and STRIPE_LIVE_SECRET_KEY settings exist
@@ -195,13 +181,12 @@ SITE_ID = 1
 
 STRIPE_LIVE_SECRET_KEY = env("STRIPE_LIVE_SECRET_KEY")
 STRIPE_TEST_SECRET_KEY = env("STRIPE_TEST_SECRET_KEY")
-STRIPE_LIVE_MODE = env("STRIPE_LIVE_MODE")
+STRIPE_LIVE_MODE = env.bool("STRIPE_LIVE_MODE", True)
 STRIPE_PUBLISHABLE_KEY = (
     env("STRIPE_LIVE_PUBLISHABLE_KEY")
     if STRIPE_LIVE_MODE
     else env("STRIPE_TEST_PUBLISHABLE_KEY")
 )
-STRIPE_LIVE_MODE = env("STRIPE_LIVE_MODE")
 DJSTRIPE_WEBHOOK_SECRET = env("DJSTRIPE_WEBHOOK_SECRET")
 # This setting is recommended in the dj-stripe docs as the best default.
 DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
@@ -223,7 +208,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "JourneyInbox - "
 ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = env("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = env.str("ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https")
 # ACCOUNT_EMAIL_CONFIRMATION_COOLDOWN => default
 # ACCOUNT_EMAIL_MAX_LENGTH => default
 # ACCOUNT_MAX_EMAIL_ADDRESSES => default
@@ -280,5 +265,5 @@ WAFFLE_CREATE_MISSING_FLAGS = True
 
 # sentry-sdk
 
-SENTRY_ENABLED = env("SENTRY_ENABLED")
+SENTRY_ENABLED = env.bool("SENTRY_ENABLED", True)
 SENTRY_DSN = env("SENTRY_DSN")
