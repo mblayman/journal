@@ -41,3 +41,9 @@ def privacy(request: HttpRequest) -> HttpResponse:
     """The privacy policy"""
     context = {}
     return render(request, "core/privacy.html", context)
+
+
+@allow
+def up(request):
+    """A healthcheck to show when the app is up and able to respond to requests."""
+    return render(request, "core/up.html", {})

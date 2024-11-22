@@ -49,3 +49,11 @@ class TestPrivacyPolicy:
         response = client.get(reverse("privacy"))
 
         assert response.status_code == 200
+
+
+class TestUp:
+    def test_unauthenticated(self, client):
+        """An unauthenticated user gets a valid response."""
+        response = client.get(reverse("up"))
+
+        assert response.status_code == 200
