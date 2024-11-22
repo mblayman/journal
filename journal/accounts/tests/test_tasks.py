@@ -3,8 +3,8 @@ import datetime
 from django.utils import timezone
 
 from journal.accounts import constants
-from journal.accounts.jobs.expire_trials import Job
 from journal.accounts.models import Account
+from journal.accounts.tasks import expire_trials
 from journal.accounts.tests.factories import AccountFactory
 
 
@@ -17,9 +17,8 @@ class TestExpireTrials:
             user__date_joined=timezone.now()
             - datetime.timedelta(days=constants.TRIAL_DAYS + 5),
         )
-        job = Job()
 
-        job.execute()
+        expire_trials()
 
         account.refresh_from_db()
         assert account.status == Account.Status.TRIAL_EXPIRED
@@ -28,9 +27,8 @@ class TestExpireTrials:
         """Recent trials are not expired."""
         trialing = Account.Status.TRIALING
         account = AccountFactory(status=trialing, user__date_joined=timezone.now())
-        job = Job()
 
-        job.execute()
+        expire_trials()
 
         account.refresh_from_db()
         assert account.status == Account.Status.TRIALING
@@ -43,9 +41,8 @@ class TestExpireTrials:
             user__date_joined=timezone.now()
             - datetime.timedelta(days=constants.TRIAL_DAYS + 5),
         )
-        job = Job()
 
-        job.execute()
+        expire_trials()
 
         account.refresh_from_db()
         assert account.status == Account.Status.ACTIVE

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "anymail",
     "django_extensions",
     "djstripe",
+    "huey.contrib.djhuey",
     "simple_history",
     "waffle",
     "journal.accounts",
@@ -262,6 +263,13 @@ HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
 # django-waffle
 
 WAFFLE_CREATE_MISSING_FLAGS = True
+
+# Huey
+HUEY = {
+    "huey_class": "huey.SqliteHuey",
+    "filename": env.path("DB_DIR", BASE_DIR) / "huey.sqlite3",
+    "immediate": False,
+}
 
 # sentry-sdk
 

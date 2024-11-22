@@ -16,6 +16,7 @@ dependencies = [
     "django==5.0.7",
     "environs>=11.2.1",
     "gunicorn==22.0.0",
+    "huey>=2.5.2",
     "python-dateutil==2.9.0.post0",
     "sentry-sdk==2.9.0",
     "whitenoise[brotli]==6.7.0",

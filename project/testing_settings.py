@@ -10,6 +10,12 @@ DATABASES = {
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
+HUEY = {
+    "huey_class": "huey.SqliteHuey",
+    "filename": ":memory:",
+    "immediate": True,
+}
+
 STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",

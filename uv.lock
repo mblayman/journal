@@ -388,6 +388,12 @@ wheels = [
 ]
 
 [[package]]
+name = "huey"
+version = "2.5.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/fe/2e063984cdd512aa71e9c9c2a9200b58a830c532d25ca2c6cbc8e44bf7b7/huey-2.5.2.tar.gz", hash = "sha256:df33db474c05414ed40ee2110e9df692369871734da22d74ffb035a4bd74047f", size = 889357 }
+
+[[package]]
 name = "identify"
 version = "2.6.2"
 source = { registry = "https://pypi.org/simple" }
@@ -432,6 +438,7 @@ dependencies = [
     { name = "django-waffle" },
     { name = "environs" },
     { name = "gunicorn" },
+    { name = "huey" },
     { name = "python-dateutil" },
     { name = "sentry-sdk" },
     { name = "whitenoise", extra = ["brotli"] },
@@ -465,6 +472,7 @@ requires-dist = [
     { name = "django-waffle", specifier = "==4.1.0" },
     { name = "environs", specifier = ">=11.2.1" },
     { name = "gunicorn", specifier = "==22.0.0" },
+    { name = "huey", specifier = ">=2.5.2" },
     { name = "python-dateutil", specifier = "==2.9.0.post0" },
     { name = "sentry-sdk", specifier = "==2.9.0" },
     { name = "whitenoise", extras = ["brotli"], specifier = "==6.7.0" },

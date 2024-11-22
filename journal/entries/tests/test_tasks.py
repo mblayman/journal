@@ -2,8 +2,8 @@ import time_machine
 from django.utils import timezone
 
 from journal.accounts.tests.factories import EmailAddressFactory, UserFactory
-from journal.entries.jobs.send_mail import Job as SendMailJob
 from journal.entries.models import Prompt
+from journal.entries.tasks import send_mail
 from journal.entries.tests.factories import EntryFactory, PromptFactory
 
 
@@ -15,9 +15,8 @@ class TestSendMailJob:
         EmailAddressFactory(user=user)
         body = "This is the entry.\n\nIt has newlines."
         entry = EntryFactory(user=user, body=body)
-        job = SendMailJob()
 
-        job.execute()
+        send_mail()
 
         assert len(mailoutbox) == 1
         mail = mailoutbox[0]
@@ -36,9 +35,8 @@ class TestSendMailJob:
         """The message indicates that a previous entry will appear once it exists."""
         user = UserFactory()
         EmailAddressFactory(user=user)
-        job = SendMailJob()
 
-        job.execute()
+        send_mail()
 
         assert len(mailoutbox) == 1
         mail = mailoutbox[0]
@@ -54,9 +52,8 @@ class TestSendMailJob:
         body = "This is the entry.\n\nIt has newlines."
         EntryFactory(user=user, body=body)
         PromptFactory(user=user, when=timezone.localdate())
-        job = SendMailJob()
 
-        job.execute()
+        send_mail()
 
         assert len(mailoutbox) == 0
         assert Prompt.objects.filter(user=user).count() == 1
