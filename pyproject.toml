@@ -22,8 +22,8 @@ dependencies = [
     "whitenoise[brotli]==6.7.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "factory-boy==3.3.0",
     "honcho>=2.0.0",
     "pre-commit>=4.0.1",
