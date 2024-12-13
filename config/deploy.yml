@@ -3,17 +3,17 @@ image: mblayman/journal
 
 servers:
   web:
-    - 123.123.123.123
+    - 178.128.132.8
   worker:
     hosts:
-      - 123.123.123.123
+      - 178.128.132.8
     cmd:
       # Don't waste time running the system checks.
       python /app/manage.py run_huey --skip-checks
 
 proxy:
   app_port: 8000
-  host: journeyinbox.com
+  host: staging.journeyinbox.com
   ssl: true
   healthcheck:
     # The db migration might make the app take longer to boot up
