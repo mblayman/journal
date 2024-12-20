@@ -5,6 +5,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
+        "OPTIONS": {
+            "init_command": "PRAGMA journal_mode=wal;",
+            "transaction_mode": "IMMEDIATE",
+        },
     }
 }
 

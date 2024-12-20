@@ -13,7 +13,7 @@ dependencies = [
     "django-hashid-field==3.4.1",
     "django-simple-history==3.7.0",
     "django-waffle==4.1.0",
-    "django==5.0.7",
+    "django>=5.1",
     "environs>=11.2.1",
     "gunicorn==22.0.0",
     "huey>=2.5.2",
