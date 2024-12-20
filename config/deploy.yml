@@ -13,7 +13,7 @@ servers:
 
 proxy:
   app_port: 8000
-  host: staging.journeyinbox.com
+  host: journeyinbox.com
   ssl: true
   healthcheck:
     # The db migration might make the app take longer to boot up
