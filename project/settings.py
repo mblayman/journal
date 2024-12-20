@@ -158,13 +158,19 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", 60 * 60 * 24 * 365)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", True)
+# The health check was failing with a 301 to HTTPS.
+# With kamal-proxy in front and the .app domain, this should not be needed.
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", True)
 
 SILENCED_SYSTEM_CHECKS: list[str] = [
     # STRIPE_TEST_SECRET_KEY and STRIPE_LIVE_SECRET_KEY settings exist
     # and djstripe wants them not to exist.
     "djstripe.I002",
+    # Disable warning about SECURE_SSL_REDIRECT.
+    # The combo of kamal-proxy using Let's Encrypt and the `.app` domain
+    # only working with HTTPS means that the warning can be ignored safely.
+    "security.W008",
 ]
 
 # Static files (CSS, JavaScript, Images)
