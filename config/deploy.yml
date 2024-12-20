@@ -28,7 +28,6 @@ registry:
 builder:
   arch:
     - amd64
-    - arm64
 
 env:
   clear:
@@ -42,7 +41,7 @@ env:
     DEBUG: "False"
     PYTHONUNBUFFERED: "1"
   secret:
-    - ADMIN_URL_TOKEN_PATH
+    - ADMIN_URL_PATH_TOKEN
     - ANYMAIL_WEBHOOK_SECRET
     - DJSTRIPE_WEBHOOK_SECRET
     - EMAIL_SENDGRID_REPLY_TO
