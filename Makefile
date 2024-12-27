@@ -3,6 +3,9 @@
 local:
 	uv run honcho start -f Procfile
 
+shell:
+	uv run manage.py shell
+
 coverage:
 	uv run pytest --cov=journal --migrations -n 2 --dist loadfile
 

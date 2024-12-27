@@ -1,6 +1,5 @@
 from pathlib import Path
 
-# import dj_database_url
 import environs
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -93,18 +92,18 @@ WSGI_APPLICATION = "project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": dj_database_url.config(
-#         conn_max_age=env.int("DATABASE_CONN_MAX_AGE", 600),
-#         ssl_require=env.bool("DATABASE_SSL_REQUIRE", True),
-#     )
-# }
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": env.path("DB_DIR", BASE_DIR) / "db.sqlite3",
         "OPTIONS": {
-            "init_command": "PRAGMA journal_mode=wal;",
+            "init_command": """
+                PRAGMA journal_mode=wal;
+                PRAGMA busy_timeout=5000;
+                PRAGMA synchronous=normal;
+                PRAGMA cache_size=-20000;
+                PRAGMA temp_store=memory;
+            """,
             "transaction_mode": "IMMEDIATE",
         },
     }
