@@ -2,9 +2,11 @@ from denied.decorators import allow
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
+from sesame.views import LoginView
 
 from journal.accounts.views import (
     account_settings,
+    check_email,
     create_billing_portal_session,
     create_checkout_session,
     success,
@@ -25,6 +27,8 @@ urlpatterns = [
     #
     # Accounts
     #
+    path("check-email", check_email, name="check-email"),
+    path("login", LoginView.as_view(), name="sesame-login"),
     path(
         "accounts/create-checkout-session/",
         create_checkout_session,

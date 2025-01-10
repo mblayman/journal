@@ -2,7 +2,7 @@ import datetime
 
 from django.utils import timezone
 from huey import crontab
-from huey.contrib.djhuey import db_periodic_task
+from huey.contrib.djhuey import db_periodic_task, db_task
 
 from . import constants
 from .models import Account
@@ -20,3 +20,11 @@ def expire_trials():
     )
     count = expired_trials.update(status=Account.Status.TRIAL_EXPIRED)
     print(f"Expired {count} trial(s)")
+
+
+@db_task()
+def generate_magic_link(user_id):
+    """Generate magic link and send email."""
+    # FIXME: fetch the user
+    # FIXME: generate the link
+    # FIXME: send the magic link email

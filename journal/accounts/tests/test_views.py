@@ -5,6 +5,14 @@ from django.urls import reverse
 from journal.accounts.tests.factories import UserFactory
 
 
+class TestCheckEmail:
+    def test_unauthenticated(self, client):
+        """An unauthenticated user gets a valid response."""
+        response = client.get(reverse("check-email"))
+
+        assert response.status_code == 200
+
+
 class TestCreateCheckoutSession:
     def test_unauthenticated(self, client):
         """Only allow authenticated users."""

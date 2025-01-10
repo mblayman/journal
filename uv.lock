@@ -275,6 +275,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-sesame"
+version = "3.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/88/584aa0c56b0788ef506ca178ba647fc4403b35f4660064dffd43014c3133/django_sesame-3.2.2.tar.gz", hash = "sha256:5d753a309166356b6a0d7fc047690943b9e80b4aa7952f1a6400fe6ce60d573c", size = 17615 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/e7/951f35106972668b61e79635c93933c51c2d58f49a9c8ebf0a8ff7262331/django_sesame-3.2.2-py3-none-any.whl", hash = "sha256:523ebd4d04e28c897c262f25b78b6fd8f37e11cdca6e277fdc8bf496bd686cf5", size = 20289 },
+]
+
+[[package]]
 name = "django-simple-history"
 version = "3.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -434,6 +446,7 @@ dependencies = [
     { name = "django-denied" },
     { name = "django-extensions" },
     { name = "django-hashid-field" },
+    { name = "django-sesame" },
     { name = "django-simple-history" },
     { name = "django-waffle" },
     { name = "environs" },
@@ -468,6 +481,7 @@ requires-dist = [
     { name = "django-denied", specifier = "==1.3" },
     { name = "django-extensions", specifier = "==3.2.3" },
     { name = "django-hashid-field", specifier = "==3.4.1" },
+    { name = "django-sesame", specifier = ">=3.2.2" },
     { name = "django-simple-history", specifier = "==3.7.0" },
     { name = "django-waffle", specifier = "==4.1.0" },
     { name = "environs", specifier = ">=11.2.1" },

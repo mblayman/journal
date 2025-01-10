@@ -132,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    "sesame.backends.ModelBackend",
 ]
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
@@ -274,6 +274,14 @@ GRAPH_MODELS = {
 # django-hashid-field
 
 HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
+
+# django-sesame
+
+SESAME_TOKEN_NAME = "token"  # noqa S105
+SESAME_MAX_AGE = 60 * 60  # 1 hour
+# If JourneyInbox allows email changes in the future,
+# we may want to change this default.
+# SESAME_INVALIDATE_ON_EMAIL_CHANGE = False
 
 # django-waffle
 

@@ -20,6 +20,7 @@ dependencies = [
     "python-dateutil==2.9.0.post0",
     "sentry-sdk==2.9.0",
     "whitenoise[brotli]==6.7.0",
+    "django-sesame>=3.2.2",
 ]
 
 [dependency-groups]
