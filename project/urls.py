@@ -1,10 +1,13 @@
 from denied.decorators import allow
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.views import LogoutView
 from django.urls import include, path
+from sesame.views import LoginView
 
 from journal.accounts.views import (
     account_settings,
+    check_email,
     create_billing_portal_session,
     create_checkout_session,
     success,
@@ -25,6 +28,9 @@ urlpatterns = [
     #
     # Accounts
     #
+    path("check-email", check_email, name="check-email"),
+    path("login", LoginView.as_view(), name="sesame-login"),
+    path("logout", allow(LogoutView.as_view()), name="logout"),
     path(
         "accounts/create-checkout-session/",
         create_checkout_session,
@@ -45,7 +51,6 @@ urlpatterns = [
     #
     # Third party routes
     #
-    path("accounts/", allow(include("allauth.urls"))),
     path("anymail/", allow(include("anymail.urls"))),
     path("stripe/", allow(include("djstripe.urls", namespace="djstripe"))),
     #

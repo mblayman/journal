@@ -1,8 +1,0 @@
-Welcome to JourneyInbox!
-
-To begin your journaling journey, you need to verify your email address.
-
-Go to {{ activate_url }}
-
-Regards,
-Matt from JourneyInbox

@@ -202,15 +202,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-allauth"
-version = "0.63.6"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a1/6f/3ccc016b901d7e5a1178e78671048f889d967091586cdce2cd9d590da407/django_allauth-0.63.6.tar.gz", hash = "sha256:f15f49defb09e0604dad5214e53a69a1f723cb03176bb115c8930bcd19b91749", size = 1082450 }
-
-[[package]]
 name = "django-anymail"
 version = "11.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -272,6 +263,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0f/a5/49127bcdb4015e08ca620a3a124e0ef522d37289360f87b1418d16202ac8/django-hashid-field-3.4.1.tar.gz", hash = "sha256:6ebb1ed7323f2465525b395ed26186cfc66cdec948178ec471ad9b1301073dc7", size = 28752 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/c1/6d92eaeae92000f72f2bdae6ce2c47f056f3aca25d5c919551149ea75d71/django_hashid_field-3.4.1-py3-none-any.whl", hash = "sha256:2d072f4caf37f02941a772003c1884f4ae9b31a142e5f23e9eec583b0e981bd9", size = 20313 },
+]
+
+[[package]]
+name = "django-sesame"
+version = "3.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/88/584aa0c56b0788ef506ca178ba647fc4403b35f4660064dffd43014c3133/django_sesame-3.2.2.tar.gz", hash = "sha256:5d753a309166356b6a0d7fc047690943b9e80b4aa7952f1a6400fe6ce60d573c", size = 17615 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/e7/951f35106972668b61e79635c93933c51c2d58f49a9c8ebf0a8ff7262331/django_sesame-3.2.2-py3-none-any.whl", hash = "sha256:523ebd4d04e28c897c262f25b78b6fd8f37e11cdca6e277fdc8bf496bd686cf5", size = 20289 },
 ]
 
 [[package]]
@@ -428,12 +431,12 @@ dependencies = [
     { name = "dj-database-url" },
     { name = "dj-stripe" },
     { name = "django" },
-    { name = "django-allauth" },
     { name = "django-anymail" },
     { name = "django-debug-toolbar" },
     { name = "django-denied" },
     { name = "django-extensions" },
     { name = "django-hashid-field" },
+    { name = "django-sesame" },
     { name = "django-simple-history" },
     { name = "django-waffle" },
     { name = "environs" },
@@ -462,12 +465,12 @@ requires-dist = [
     { name = "dj-database-url", specifier = "==2.2.0" },
     { name = "dj-stripe", specifier = "==2.8.4" },
     { name = "django", specifier = ">=5.1" },
-    { name = "django-allauth", specifier = "==0.63.6" },
     { name = "django-anymail", extras = ["sendgrid"], specifier = "==11.0.1" },
     { name = "django-debug-toolbar", specifier = "==4.4.6" },
     { name = "django-denied", specifier = "==1.3" },
     { name = "django-extensions", specifier = "==3.2.3" },
     { name = "django-hashid-field", specifier = "==3.4.1" },
+    { name = "django-sesame", specifier = ">=3.2.2" },
     { name = "django-simple-history", specifier = "==3.7.0" },
     { name = "django-waffle", specifier = "==4.1.0" },
     { name = "environs", specifier = ">=11.2.1" },

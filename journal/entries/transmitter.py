@@ -52,9 +52,7 @@ def _send_message(account: Account, entry: Entry | None, today: date):
         '"JourneyInbox Journal" ' f"<journal.{account.id}@email.journeyinbox.com>"
     )
     message = AnymailMessage(
-        subject=(
-            f"It's {today:%A}, {today:%b}. {today:%-d}, {today:%Y}. " "How are you?"
-        ),
+        subject=(f"It's {today:%A}, {today:%b}. {today:%-d}, {today:%Y}. How are you?"),
         body=text_message,
         from_email=from_email,
         to=[account.user.email],

@@ -34,6 +34,13 @@ class TestIndex:
 
         assert response.status_code == 200
 
+    def test_signin(self, client):
+        """A happy post redirect to the check email page."""
+        data = {"email": "test@testing.com"}
+        response = client.post(reverse("index"), data=data)
+
+        assert response.status_code == 302
+
 
 class TestTerms:
     def test_unauthenticated(self, client):

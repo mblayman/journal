@@ -10,6 +10,7 @@ from journal.entries.models import Entry
 from journal.entries.transmitter import send_prompt
 
 
+# FIXME: orphaned. Need to send on first sign in
 def handle_email_confirmed(
     sender: Any, request: HttpRequest, email_address: str, **kwargs: Any
 ) -> None:

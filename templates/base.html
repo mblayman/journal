@@ -22,12 +22,6 @@
               Settings
             </div>
           </a>
-        {% else %}
-          <a href="{% url "account_login" %}" class="hover:brightness-110">
-            <div class="bg-lime-800 px-2 py-4">
-              Log In
-            </div>
-          </a>
         {% endif %}
       </div>
     </header>
@@ -54,7 +48,7 @@
       <a href="{% url "terms" %}" class="py-3 px-2 bg-lime-800 hover:brightness-110">Terms</a>
       <a href="{% url "faq" %}" class="py-3 px-2 bg-lime-800 hover:brightness-110">FAQ</a>
       {% if user.is_authenticated %}
-        <form class="inline py-3 px-2 bg-lime-800 hover:brightness-110" method="POST" action="{% url 'account_logout' %}">
+        <form class="inline py-3 px-2 bg-lime-800 hover:brightness-110" method="POST" action="{% url 'logout' %}">
           {% csrf_token %}
           <button class="" type="submit">Log Out</button>
         </form>
