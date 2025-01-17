@@ -3,7 +3,7 @@ from journal.accounts.models import User
 
 
 class TestSigninForm:
-    def test_create_user(self):
+    def test_create_user(self, mailoutbox):
         """A non-existing email creates a new User record."""
         # Check the username uniqueness constraint.
         User.objects.create(email="somethingelse@somewhere.com")
@@ -18,6 +18,7 @@ class TestSigninForm:
 
         assert is_valid
         assert User.objects.filter(email=email).count() == 1
+        assert mailoutbox
 
     def test_existing_user(self):
         """When a user account exists for an email, use that user."""
@@ -30,11 +31,6 @@ class TestSigninForm:
 
         assert is_valid
         assert User.objects.filter(email=user.email).count() == 1
-
-    def test_triggers_signin_link_task(self):
-        """The magic link job fires."""
-
-        # FIXME: assert that the outbox has 1 email in it *to* the right email address.
 
     def test_invalid_email(self):
         """An invalid email is rejected."""
