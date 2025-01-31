@@ -17,15 +17,10 @@ class AccountManager(models.Manager):
         qs = self.get_queryset()
         return qs.filter(status__in=self.model.ACTIVE_STATUSES)
 
-    def trialing(self):
-        """Get all the active accounts."""
-        qs = self.get_queryset()
-        return qs.filter(status=self.model.Status.TRIALING)
-
     def promptable(self):
         """Get all the accounts that can receive prompts."""
         active = self.active()
-        return active.filter(user__emailaddress__verified=True)
+        return active.filter(verified=True)
 
     def from_email(self, email: str) -> Account:
         qs = self.get_queryset()
@@ -52,6 +47,11 @@ class Account(models.Model):
     status = models.IntegerField(
         choices=Status.choices,
         default=Status.TRIALING,
+        db_index=True,
+    )
+    verified = models.BooleanField(
+        help_text="An account is verified if they log in through email at least once",
+        default=False,
         db_index=True,
     )
 
