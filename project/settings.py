@@ -167,6 +167,10 @@ SILENCED_SYSTEM_CHECKS: list[str] = [
     "security.W008",
 ]
 
+# Sessions
+# Allow users to be logged in for a year.
+SESSION_COOKIE_AGE = 365 * 24 * 60 * 60
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 

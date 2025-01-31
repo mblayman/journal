@@ -17,5 +17,5 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Account)
 class AccountAdmin(SimpleHistoryAdmin):
-    list_display = ["id", "user", "status"]
+    list_display = ["id", "user__email", "status"]
     list_filter = ["status"]
