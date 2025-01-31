@@ -22,10 +22,6 @@ class AccountManager(models.Manager):
         active = self.active()
         return active.filter(verified=True)
 
-    def from_email(self, email: str) -> Account:
-        qs = self.get_queryset()
-        return qs.filter(user__email=email).get()
-
 
 class Account(models.Model):
     """Account holds the user's state"""
