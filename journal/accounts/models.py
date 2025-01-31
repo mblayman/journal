@@ -58,10 +58,6 @@ class Account(models.Model):
     objects = AccountManager()
     history = HistoricalRecords()
 
-    @property
-    def is_trialing(self):
-        return self.status == self.Status.TRIALING
-
 
 class User(AbstractUser, ActivatorModel):
     pass
