@@ -16,8 +16,7 @@ class Migration(migrations.Migration):
                 db_index=True,
                 default=False,
                 help_text=(
-                    "An account is verified if they log in "
-                    "through email at least once"
+                    "An account is verified if they log in through email at least once"
                 ),
             ),
         ),
@@ -28,8 +27,7 @@ class Migration(migrations.Migration):
                 db_index=True,
                 default=False,
                 help_text=(
-                    "An account is verified if they log in "
-                    "through email at least once"
+                    "An account is verified if they log in through email at least once"
                 ),
             ),
         ),
