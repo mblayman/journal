@@ -1,18 +1,19 @@
 import time_machine
 from django.utils import timezone
 
-from journal.accounts.tests.factories import EmailAddressFactory, UserFactory
+from journal.accounts.tests.factories import UserFactory
 from journal.entries.models import Prompt
 from journal.entries.tasks import send_mail
 from journal.entries.tests.factories import EntryFactory, PromptFactory
 
 
-class TestSendMailJob:
+class TestSendMailTask:
     @time_machine.travel("2023-07-19")
     def test_send_email(self, mailoutbox):
         """An active account receives an email prompt."""
         user = UserFactory()
-        EmailAddressFactory(user=user)
+        user.account.verified = True
+        user.account.save()
         body = "This is the entry.\n\nIt has newlines."
         entry = EntryFactory(user=user, body=body)
 
@@ -34,7 +35,8 @@ class TestSendMailJob:
     def test_no_available_entries(self, mailoutbox):
         """The message indicates that a previous entry will appear once it exists."""
         user = UserFactory()
-        EmailAddressFactory(user=user)
+        user.account.verified = True
+        user.account.save()
 
         send_mail()
 
@@ -48,7 +50,8 @@ class TestSendMailJob:
     def test_send_email_idempotent(self, mailoutbox):
         """A user will not receive a prompt twice."""
         user = UserFactory()
-        EmailAddressFactory(user=user)
+        user.account.verified = True
+        user.account.save()
         body = "This is the entry.\n\nIt has newlines."
         EntryFactory(user=user, body=body)
         PromptFactory(user=user, when=timezone.localdate())

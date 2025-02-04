@@ -4,8 +4,11 @@ from django.utils import timezone
 
 from journal.accounts import constants
 from journal.accounts.models import Account
-from journal.accounts.tasks import expire_trials
-from journal.accounts.tests.factories import AccountFactory
+from journal.accounts.tasks import (
+    _generate_magic_link,
+    expire_trials,
+)
+from journal.accounts.tests.factories import AccountFactory, UserFactory
 
 
 class TestExpireTrials:
@@ -46,3 +49,12 @@ class TestExpireTrials:
 
         account.refresh_from_db()
         assert account.status == Account.Status.ACTIVE
+
+
+class TestGenerateMagicLink:
+    def test_sends_email(self, mailoutbox):
+        user = UserFactory()
+        _generate_magic_link(user.id)
+
+        assert mailoutbox
+        assert user.email == mailoutbox[0].to[0]

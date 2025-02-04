@@ -22,10 +22,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.sites",
     "django.contrib.staticfiles",
-    "allauth",
-    "allauth.account",
-    # Needed by default templates even though we're not using a social provider.
-    "allauth.socialaccount",
     "anymail",
     "django_extensions",
     "djstripe",
@@ -48,7 +44,6 @@ MIDDLEWARE = [
     "denied.middleware.DeniedMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
     "waffle.middleware.WaffleMiddleware",
 ]
 
@@ -132,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    "sesame.backends.ModelBackend",
 ]
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
@@ -172,6 +167,10 @@ SILENCED_SYSTEM_CHECKS: list[str] = [
     "security.W008",
 ]
 
+# Sessions
+# Allow users to be logged in for a year.
+SESSION_COOKIE_AGE = 365 * 24 * 60 * 60
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -193,6 +192,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SITE_ID = 1
 
+# App settings
+
+# Is the app in a secure context or not?
+IS_SECURE = env.bool("IS_SECURE", True)
+
 # dj-stripe
 
 STRIPE_LIVE_SECRET_KEY = env("STRIPE_LIVE_SECRET_KEY")
@@ -209,52 +213,6 @@ DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
 # This setting is recommended in the dj-stripe docs as the best default.
 DJSTRIPE_USE_NATIVE_JSONFIELD = True
 PRICE_LOOKUP_KEY = "monthly-v1"
-
-# django-allauth
-
-ACCOUNT_ADAPTER = "journal.accounts.adapter.AccountAdapter"
-# ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS => default
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL => default
-# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL => default
-# ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS => default
-# ACCOUNT_EMAIL_CONFIRMATION_HMAC => default
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_SUBJECT_PREFIX = "JourneyInbox - "
-ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = env.str("ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https")
-# ACCOUNT_EMAIL_CONFIRMATION_COOLDOWN => default
-# ACCOUNT_EMAIL_MAX_LENGTH => default
-# ACCOUNT_MAX_EMAIL_ADDRESSES => default
-# ACCOUNT_FORMS => default
-# ACCOUNT_LOGIN_ATTEMPTS_LIMIT => default
-# ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT => default
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-# ACCOUNT_LOGOUT_ON_GET => default
-# ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE => default
-# ACCOUNT_LOGIN_ON_PASSWORD_RESET => default
-# ACCOUNT_LOGOUT_REDIRECT_URL => default
-# ACCOUNT_PASSWORD_INPUT_RENDER_VALUE => default
-ACCOUNT_PRESERVE_USERNAME_CASING = False
-# ACCOUNT_PREVENT_ENUMERATION => default
-# ACCOUNT_RATE_LIMITS => default
-ACCOUNT_SESSION_REMEMBER = True
-# ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE => default
-# ACCOUNT_SIGNUP_FORM_CLASS => default
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
-# ACCOUNT_SIGNUP_REDIRECT_URL => default
-# ACCOUNT_TEMPLATE_EXTENSION => default
-# ACCOUNT_USERNAME_BLACKLIST => default
-# ACCOUNT_UNIQUE_EMAIL => default
-ACCOUNT_USER_DISPLAY = lambda user: user.email  # noqa
-# ACCOUNT_USER_MODEL_EMAIL_FIELD => default
-# ACCOUNT_USER_MODEL_USERNAME_FIELD => default
-# ACCOUNT_USERNAME_MIN_LENGTH => default
-ACCOUNT_USERNAME_REQUIRED = False
-# ACCOUNT_USERNAME_VALIDATORS => default
-# SOCIALACCOUNT_* => default
 
 # django-anymail
 
@@ -274,6 +232,14 @@ GRAPH_MODELS = {
 # django-hashid-field
 
 HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
+
+# django-sesame
+
+SESAME_TOKEN_NAME = "token"  # noqa S105
+SESAME_MAX_AGE = 60 * 60  # 1 hour
+# If JourneyInbox allows email changes in the future,
+# we may want to change this default.
+# SESAME_INVALIDATE_ON_EMAIL_CHANGE = False
 
 # django-waffle
 

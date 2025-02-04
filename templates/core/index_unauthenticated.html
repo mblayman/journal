@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load accounts_tags waffle_tags %}
 
 {% block title %}Track Your Journey{% endblock %}
 
@@ -21,6 +22,28 @@
     </p>
     <p class="mb-8">Matt Layman,<br>JourneyInbox creator</p>
     <p class="text-gray-600 mb-6">You can enjoy JourneyInbox for free for {{ trial_days }} days. No credit card required.</p>
-    <a href="{% url "account_signup" %}" class="p-2 bg-lime-800 text-white">Sign Up</a>
+    {% flag signup_flag %}
+      <div class="max-w-md border border-lime-600 mx-auto p-4 sm:p-8">
+        <form method="POST">
+          {% csrf_token %}
+          <div>
+            <input class="border mb-2 p-2" name="email" id="id_email" type="email" placeholder="Email...">
+            <input class="p-2 bg-lime-800 text-white" type="submit" value="Start Journaling">
+          </div>
+        </form>
+        <p class="text-xs text-muted mt-6 leading-snug">
+           If you already have an account, we'll log you in.
+        </p>
+        <p class="text-xs text-muted mt-2 leading-snug">
+          For new users,
+          by continuing,
+          you agree to JourneyInbox&rsquo;s
+          <a href="{% url "terms" %}" class="underline" target="_blank">Terms of Service</a> and
+          <a href="{% url "privacy" %}" class="underline" target="_blank">Privacy Policy</a>.
+        </p>
+      <div>
+    {% else %}
+      <p>Sorry, we are not accepting new sign ups right now.</p>
+    {% endflag %}
   </div>
 {% endblock %}
