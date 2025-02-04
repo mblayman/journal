@@ -22,8 +22,7 @@ class TestSendMailTask:
         assert len(mailoutbox) == 1
         mail = mailoutbox[0]
         assert mail.from_email == (
-            '"JourneyInbox Journal" '
-            f"<journal.{user.account.id}@email.journeyinbox.com>"
+            f'"JourneyInbox Journal" <journal.{user.account.id}@email.journeyinbox.com>'
         )
         assert mail.to == [user.email]
         assert mail.subject == "It's Wednesday, Jul. 19, 2023. How are you?"

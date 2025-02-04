@@ -48,9 +48,7 @@ def _send_message(account: Account, entry: Entry | None, today: date):
 
     text_message = render_to_string("entries/email/prompt.txt", context)
     html_message = render_to_string("entries/email/prompt.html", context)
-    from_email = (
-        '"JourneyInbox Journal" ' f"<journal.{account.id}@email.journeyinbox.com>"
-    )
+    from_email = f'"JourneyInbox Journal" <journal.{account.id}@email.journeyinbox.com>'
     message = AnymailMessage(
         subject=(f"It's {today:%A}, {today:%b}. {today:%-d}, {today:%Y}. How are you?"),
         body=text_message,
