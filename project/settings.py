@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     "django_extensions",
     "huey.contrib.djhuey",
     "simple_history",
-    "waffle",
     "journal.accounts",
     "journal.core",
     "journal.entries",
@@ -40,10 +39,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "denied.middleware.DeniedMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "waffle.middleware.WaffleMiddleware",
 ]
 
 # Enable the debug toolbar only in DEBUG mode.
@@ -210,10 +207,6 @@ GRAPH_MODELS = {
 # django-hashid-field
 
 HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
-
-# django-waffle
-
-WAFFLE_CREATE_MISSING_FLAGS = True
 
 # Huey
 HUEY = {
