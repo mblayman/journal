@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load accounts_tags waffle_tags %}
+{% load waffle_tags %}
 
 {% block title %}Track Your Journey{% endblock %}
 
@@ -21,7 +21,6 @@
     for many months now.
     </p>
     <p class="mb-8">Matt Layman,<br>JourneyInbox creator</p>
-    <p class="text-gray-600 mb-6">You can enjoy JourneyInbox for free for {{ trial_days }} days. No credit card required.</p>
     {% flag signup_flag %}
       <div class="max-w-md border border-lime-600 mx-auto p-4 sm:p-8">
         <form method="POST">
@@ -38,8 +37,6 @@
           For new users,
           by continuing,
           you agree to JourneyInbox&rsquo;s
-          <a href="{% url "terms" %}" class="underline" target="_blank">Terms of Service</a> and
-          <a href="{% url "privacy" %}" class="underline" target="_blank">Privacy Policy</a>.
         </p>
       <div>
     {% else %}

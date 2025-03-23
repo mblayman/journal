@@ -24,26 +24,3 @@
     {% endif %}
   </div>
 {% endblock %}
-
-{% block scripts %}
-  {% if user.account.status == user.account.Status.ACTIVE %}
-    <script>
-      document
-        .getElementById("manage-billing")
-        .addEventListener("click", function(evt) {
-          evt.preventDefault();
-          fetch("{% url 'create_billing_portal_session' %}", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}"
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              window.location.href = data.url;
-            });
-        });
-    </script>
-  {% endif %}
-{% endblock %}
