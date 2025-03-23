@@ -1,17 +1,3 @@
-FROM node:22 AS nodejs
-
-WORKDIR /app
-
-COPY frontend/package.json frontend/package-lock.json ./
-
-RUN --mount=type=cache,target=/root/.npm \
-    npm install --loglevel verbose
-
-COPY frontend frontend/
-COPY templates templates/
-
-RUN npm --prefix frontend run build
-
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -34,8 +20,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY --chown=app:app . /app/
 
-COPY --from=nodejs /app/static/site.css static/
-
 # Some configuration is needed to make Django happy, but these values have no
 # impact to collectstatic so we can use dummy values.
 RUN \
@@ -46,10 +30,6 @@ RUN \
     SENDGRID_API_KEY=a-secret-to-everybody \
     SENTRY_DSN=dsn_example \
     SENTRY_ENABLED=off \
-    STRIPE_LIVE_PUBLISHABLE_KEY=pk_live_a-secret-to-everybody \
-    STRIPE_LIVE_SECRET_KEY=sk_live_a-secret-to-everybody \
-    STRIPE_TEST_PUBLISHABLE_KEY=pk_test_a-secret-to-everybody \
-    STRIPE_TEST_SECRET_KEY=sk_test_a-secret-to-everybody \
     python manage.py collectstatic --noinput
 
 USER app
