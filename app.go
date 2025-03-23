@@ -18,9 +18,14 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func up(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "ok")
+}
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
+	mux.HandleFunc("/up", up)
 
 	fmt.Println("Server starting on port 8000...")
 	err := http.ListenAndServe(":8000", mux)
