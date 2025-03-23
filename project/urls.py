@@ -9,7 +9,6 @@ urlpatterns = [
     path("", index, name="index"),
     path("up", up, name="up"),
     path("anymail/", allow(include("anymail.urls"))),
-    path("stripe/", allow(include("djstripe.urls", namespace="djstripe"))),
     path(f"{settings.ADMIN_URL_PATH_TOKEN}/admin/", allow(admin.site.urls)),
 ]
 

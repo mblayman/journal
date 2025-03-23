@@ -175,19 +175,6 @@ wheels = [
 ]
 
 [[package]]
-name = "dj-stripe"
-version = "2.8.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "stripe" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/bd/c7/4703a8b451e9f93d7184e8a683c7dfead01bfec8eb72fc274fd630f3146d/dj_stripe-2.8.4.tar.gz", hash = "sha256:2abfc4f690af4dd65d57dfbb5d36ffaf63b9225f0a5ac95ea21783c80a95982b", size = 151454 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/2a/0593c5bb89e7b65457ef14f09444309c1f7c29a14fced92ee0f198ad26f1/dj_stripe-2.8.4-py3-none-any.whl", hash = "sha256:e4665ffc9b54b558310b157b4f67aa92ec6936c0c4e21e13ddeaac90c25b90b1", size = 182913 },
-]
-
-[[package]]
 name = "django"
 version = "5.1.4"
 source = { registry = "https://pypi.org/simple" }
@@ -263,18 +250,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0f/a5/49127bcdb4015e08ca620a3a124e0ef522d37289360f87b1418d16202ac8/django-hashid-field-3.4.1.tar.gz", hash = "sha256:6ebb1ed7323f2465525b395ed26186cfc66cdec948178ec471ad9b1301073dc7", size = 28752 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/c1/6d92eaeae92000f72f2bdae6ce2c47f056f3aca25d5c919551149ea75d71/django_hashid_field-3.4.1-py3-none-any.whl", hash = "sha256:2d072f4caf37f02941a772003c1884f4ae9b31a142e5f23e9eec583b0e981bd9", size = 20313 },
-]
-
-[[package]]
-name = "django-sesame"
-version = "3.2.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/eb/88/584aa0c56b0788ef506ca178ba647fc4403b35f4660064dffd43014c3133/django_sesame-3.2.2.tar.gz", hash = "sha256:5d753a309166356b6a0d7fc047690943b9e80b4aa7952f1a6400fe6ce60d573c", size = 17615 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/dd/e7/951f35106972668b61e79635c93933c51c2d58f49a9c8ebf0a8ff7262331/django_sesame-3.2.2-py3-none-any.whl", hash = "sha256:523ebd4d04e28c897c262f25b78b6fd8f37e11cdca6e277fdc8bf496bd686cf5", size = 20289 },
 ]
 
 [[package]]
@@ -429,14 +404,12 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "dj-database-url" },
-    { name = "dj-stripe" },
     { name = "django" },
     { name = "django-anymail" },
     { name = "django-debug-toolbar" },
     { name = "django-denied" },
     { name = "django-extensions" },
     { name = "django-hashid-field" },
-    { name = "django-sesame" },
     { name = "django-simple-history" },
     { name = "django-waffle" },
     { name = "environs" },
@@ -463,14 +436,12 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "dj-database-url", specifier = "==2.2.0" },
-    { name = "dj-stripe", specifier = "==2.8.4" },
     { name = "django", specifier = ">=5.1" },
     { name = "django-anymail", extras = ["sendgrid"], specifier = "==11.0.1" },
     { name = "django-debug-toolbar", specifier = "==4.4.6" },
     { name = "django-denied", specifier = "==1.3" },
     { name = "django-extensions", specifier = "==3.2.3" },
     { name = "django-hashid-field", specifier = "==3.4.1" },
-    { name = "django-sesame", specifier = ">=3.2.2" },
     { name = "django-simple-history", specifier = "==3.7.0" },
     { name = "django-waffle", specifier = "==4.1.0" },
     { name = "environs", specifier = ">=11.2.1" },
@@ -739,18 +710,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/57/61/5bc3aff85dc5bf98291b37cf469dab74b3d0aef2dd88eade9070a200af05/sqlparse-0.5.2.tar.gz", hash = "sha256:9e37b35e16d1cc652a2545f0997c1deb23ea28fa1f3eefe609eee3063c3b105f", size = 84951 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7a/13/5f6654c9d915077fae255686ca6fa42095b62b7337e3e1aa9e82caa6f43a/sqlparse-0.5.2-py3-none-any.whl", hash = "sha256:e99bc85c78160918c3e1d9230834ab8d80fc06c59d03f8db2618f65f65dda55e", size = 44407 },
-]
-
-[[package]]
-name = "stripe"
-version = "4.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a1/06/7b69b9fb7148732f7c5eed4e0062c04214bca40c176419373d53e3e19dfd/stripe-4.2.0.tar.gz", hash = "sha256:f0134704bd4e9410fae25034836dc6f5849d92c0f9083d58d43e01b3e631ac4c", size = 267578 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/9f/863f6b804cb80c8baf8f7d6e0c776e4e4da6238f530ef8c6648ffac07a82/stripe-4.2.0-py2.py3-none-any.whl", hash = "sha256:8ce03bfc099465740e33890000c454e79316c8730e45ad1efbaec3d52a019d05", size = 252200 },
 ]
 
 [[package]]

@@ -6,7 +6,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_extensions.db.models import ActivatorModel
-from djstripe import webhooks
 from hashid_field import HashidAutoField
 from simple_history.models import HistoricalRecords
 
@@ -64,15 +63,3 @@ def create_account(sender, instance, created, raw, **kwargs):
     """A new user gets an associated account."""
     if created and not raw:
         Account.objects.create(user=instance)
-
-
-@webhooks.handler("checkout.session.completed")
-def handle_checkout_session_completed(event, **kwargs):
-    """Transition the account to an active state.
-
-    This event occurs after a user provides their checkout payment information.
-    """
-    event_data = event.data["object"]
-    # The payments gateway sets the user ID in the client reference ID field.
-    user_id = int(event_data["client_reference_id"])
-    Account.objects.filter(user_id=user_id).update(status=Account.Status.ACTIVE)

@@ -41,7 +41,6 @@ COPY --from=nodejs /app/static/site.css static/
 RUN \
     ADMIN_URL_PATH_TOKEN=fake-token \
     ANYMAIL_WEBHOOK_SECRET=a-secret-to-everybody \
-    DJSTRIPE_WEBHOOK_SECRET=whsec_asecrettoeverybody \
     HASHID_FIELD_SALT=a-secret-to-everybody \
     SECRET_KEY=a-secret-to-everybody \
     SENDGRID_API_KEY=a-secret-to-everybody \
