@@ -15,14 +15,6 @@
             Journey<span class="text-orange-300">Inbox</span>
           </div>
         </a>
-        <div class="grow"></div>
-        {% if user.is_authenticated %}
-          <a href="{% url "settings" %}" class="hover:brightness-110">
-            <div class="bg-lime-800 px-2 py-4">
-              Settings
-            </div>
-          </a>
-        {% endif %}
       </div>
     </header>
     <main class="container mx-auto pt-12 px-4 sm:px-0 grow">
