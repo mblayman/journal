@@ -1,1 +1,0 @@
-TRIAL_DAYS = 14

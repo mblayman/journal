@@ -24,10 +24,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "anymail",
     "django_extensions",
-    "djstripe",
     "huey.contrib.djhuey",
     "simple_history",
-    "waffle",
     "journal.accounts",
     "journal.core",
     "journal.entries",
@@ -41,10 +39,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "denied.middleware.DeniedMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "waffle.middleware.WaffleMiddleware",
 ]
 
 # Enable the debug toolbar only in DEBUG mode.
@@ -127,7 +123,6 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "sesame.backends.ModelBackend",
 ]
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
@@ -158,9 +153,6 @@ SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", True)
 
 SILENCED_SYSTEM_CHECKS: list[str] = [
-    # STRIPE_TEST_SECRET_KEY and STRIPE_LIVE_SECRET_KEY settings exist
-    # and djstripe wants them not to exist.
-    "djstripe.I002",
     # Disable warning about SECURE_SSL_REDIRECT.
     # The combo of kamal-proxy using Let's Encrypt and the `.app` domain
     # only working with HTTPS means that the warning can be ignored safely.
@@ -197,23 +189,6 @@ SITE_ID = 1
 # Is the app in a secure context or not?
 IS_SECURE = env.bool("IS_SECURE", True)
 
-# dj-stripe
-
-STRIPE_LIVE_SECRET_KEY = env("STRIPE_LIVE_SECRET_KEY")
-STRIPE_TEST_SECRET_KEY = env("STRIPE_TEST_SECRET_KEY")
-STRIPE_LIVE_MODE = env.bool("STRIPE_LIVE_MODE", True)
-STRIPE_PUBLISHABLE_KEY = (
-    env("STRIPE_LIVE_PUBLISHABLE_KEY")
-    if STRIPE_LIVE_MODE
-    else env("STRIPE_TEST_PUBLISHABLE_KEY")
-)
-DJSTRIPE_WEBHOOK_SECRET = env("DJSTRIPE_WEBHOOK_SECRET")
-# This setting is recommended in the dj-stripe docs as the best default.
-DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
-# This setting is recommended in the dj-stripe docs as the best default.
-DJSTRIPE_USE_NATIVE_JSONFIELD = True
-PRICE_LOOKUP_KEY = "monthly-v1"
-
 # django-anymail
 
 ANYMAIL = {
@@ -232,18 +207,6 @@ GRAPH_MODELS = {
 # django-hashid-field
 
 HASHID_FIELD_SALT = env("HASHID_FIELD_SALT")
-
-# django-sesame
-
-SESAME_TOKEN_NAME = "token"  # noqa S105
-SESAME_MAX_AGE = 60 * 60  # 1 hour
-# If JourneyInbox allows email changes in the future,
-# we may want to change this default.
-# SESAME_INVALIDATE_ON_EMAIL_CHANGE = False
-
-# django-waffle
-
-WAFFLE_CREATE_MISSING_FLAGS = True
 
 # Huey
 HUEY = {

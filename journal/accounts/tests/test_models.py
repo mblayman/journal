@@ -1,5 +1,5 @@
-from journal.accounts.models import Account, handle_checkout_session_completed
-from journal.accounts.tests.factories import AccountFactory, EventFactory, UserFactory
+from journal.accounts.models import Account
+from journal.accounts.tests.factories import AccountFactory, UserFactory
 
 
 class TestAccount:
@@ -31,17 +31,3 @@ class TestUser:
 
         assert user is not None
         assert user.account is not None
-
-
-class TestHandleCheckoutSessionCompleted:
-    def test_account_active(self):
-        """An account is set to the active state."""
-        account = AccountFactory(status=Account.Status.TRIALING)
-        event = EventFactory(
-            data={"object": {"client_reference_id": str(account.user.id)}}
-        )
-
-        handle_checkout_session_completed(event)
-
-        account.refresh_from_db()
-        assert account.status == Account.Status.ACTIVE
