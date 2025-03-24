@@ -27,8 +27,8 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 
-	fmt.Println("Server starting on port 8000...")
-	err := http.ListenAndServe(":8000", mux)
+	fmt.Println("Server starting on port 8080...")
+	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		fmt.Printf("Server failed to start: %v\n", err)
 	}

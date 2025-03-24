@@ -19,6 +19,7 @@ and save $8/month.
 2. Get the binary baked into the Docker image early.
 3. Deploy and run the Go binary along with the main process.
    Use `beta.journeyinbox.com` as a temporary domain name.
+4. Integrate Sentry.
 
 ### MVP
 
