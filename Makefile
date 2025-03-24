@@ -15,3 +15,6 @@ test: fcov
 fcov:
 	@echo "Running fast coverage check"
 	@uv run pytest --cov=journal -n 4 --dist loadfile -q
+
+build:
+	go build -o app

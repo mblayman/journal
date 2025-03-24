@@ -1,3 +1,18 @@
+FROM golang:1.24.1-bookworm AS builder
+
+WORKDIR /app
+
+# TODO: update when there is a go.sum file.
+# COPY go.mod go.sum ./
+COPY go.mod ./
+
+# Download dependencies
+# RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o app .
+
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -33,6 +48,8 @@ RUN \
     python manage.py collectstatic --noinput
 
 USER app
+
+COPY --from=builder --chown=app:app /app/app .
 
 ENTRYPOINT ["/app/bin/docker-entrypoint"]
 EXPOSE 8000

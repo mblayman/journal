@@ -164,3 +164,6 @@ models.png
 # JavaScript
 node_modules
 static/site.css
+
+# Go
+/app
