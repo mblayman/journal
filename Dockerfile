@@ -2,12 +2,9 @@ FROM golang:1.24.1-bookworm AS builder
 
 WORKDIR /app
 
-# TODO: update when there is a go.sum file.
-# COPY go.mod go.sum ./
-COPY go.mod ./
+COPY go.mod go.sum ./
 
-# Download dependencies
-# RUN go mod download
+RUN go mod download
 
 COPY . .
 
