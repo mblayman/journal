@@ -73,6 +73,7 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 	}
 }
 
+// extractTextContent pulls the text version of the email from the raw email message.
 func extractTextContent(emailRaw string, logger *log.Logger) (string, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader([]byte(emailRaw)))
 	if err != nil {
