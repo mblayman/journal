@@ -12,7 +12,8 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/joho/godotenv"
-	"github.com/mblayman/journal/model"
+	"github.com/mblayman/journal/entries"
+	"github.com/mblayman/journal/webhook"
 )
 
 //go:embed go_templates
@@ -70,9 +71,9 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 	username, password := getWebhookAuth()
-	// TODO: implement the real processor
-	processor := func(model.EmailContent) {}
-	mux.HandleFunc("/webhook", webhookHandler(username, password, processor, logger))
+	// TODO: pass in required to address
+	processor := entries.MakeEmailContentProcessor("")
+	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
 	logger.Println("Server starting on port 8080...")
 	err = http.ListenAndServe(":8080", mux)

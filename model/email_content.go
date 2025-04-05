@@ -18,3 +18,7 @@ func (emailContent *EmailContent) ToAddress() string {
 	}
 	return emailContent.To[start+1 : end]
 }
+
+// EmailContentProcessor is the callback that does all the necessary
+// processing on the (relatively) raw email data.
+type EmailContentProcessor func(EmailContent)

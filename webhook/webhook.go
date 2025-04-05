@@ -1,4 +1,4 @@
-package main
+package webhook
 
 import (
 	"bytes"
@@ -17,11 +17,9 @@ import (
 	"github.com/mblayman/journal/model"
 )
 
-// EmailContentProcessor is the callback that does all the necessary
-// processing on the (relatively) raw email data.
-type EmailContentProcessor func(model.EmailContent)
-
-func webhookHandler(username, password string, processor EmailContentProcessor, logger *log.Logger) http.HandlerFunc {
+// WebhookHandler returns a handler func that can process webhook
+// data sent by SendGrid. The email content is delegated to the processor.
+func WebhookHandler(username, password string, processor model.EmailContentProcessor, logger *log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

@@ -1,4 +1,4 @@
-package main
+package webhook
 
 import (
 	"bytes"
@@ -103,7 +103,7 @@ func TestWebhookHandler(t *testing.T) {
 
 	}
 
-	handler := webhookHandler(username, password, processor, logger)
+	handler := WebhookHandler(username, password, processor, logger)
 
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
@@ -149,7 +149,7 @@ func TestWebhookHandlerUnauthorized(t *testing.T) {
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
 	processor := func(model.EmailContent) {}
-	handler := webhookHandler(username, password, processor, logger)
+	handler := WebhookHandler(username, password, processor, logger)
 
 	// Create a request without auth
 	req := httptest.NewRequest(http.MethodPost, "/webhook", nil)
@@ -171,7 +171,7 @@ func TestWebhookHandlerMethodNotAllowed(t *testing.T) {
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
 	processor := func(model.EmailContent) {}
-	handler := webhookHandler(username, password, processor, logger)
+	handler := WebhookHandler(username, password, processor, logger)
 
 	req := httptest.NewRequest(http.MethodGet, "/webhook", nil)
 	req.SetBasicAuth(username, password)
