@@ -9,7 +9,10 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/mail"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 type EmailContent struct {
@@ -32,6 +35,28 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 			return
 		}
 
+		// Read the raw request body
+		bodyBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			logger.Printf("Error reading request body: %v", err)
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
+
+		// Save the request body to a file
+		filename := fmt.Sprintf("webhook_%s.bin", time.Now().Format("20060102_150405.999"))
+		filePath := filepath.Join("/var/db", filename)
+		if err := os.WriteFile(filePath, bodyBytes, 0644); err != nil {
+			logger.Printf("Error writing request body to file %s: %v", filePath, err)
+			// Don’t fail the request, just log the error
+		} else {
+			logger.Printf("Saved request body to %s", filePath)
+		}
+
+		// Reconstruct the body for processing
+		r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
 		mediaType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 		if err != nil || mediaType != "multipart/form-data" {
 			logger.Printf("Invalid Content-Type: %v", err)
@@ -46,7 +71,6 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 			http.Error(w, "Error parsing form", http.StatusBadRequest)
 			return
 		}
-		defer r.Body.Close()
 
 		if emailValues, ok := form.Value["email"]; !ok || len(emailValues) == 0 {
 			logger.Printf("No email field found in webhook")
@@ -61,14 +85,21 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 			}
 			logger.Printf("To: %s", content.To)
 			singleLineText := strings.ReplaceAll(content.Text, "\n", " ")
-			logger.Printf("Text Content: %s", singleLineText)
+			logger.Printf("Text Content (length=%d): %s", len(singleLineText), singleLineText[:min(100, len(singleLineText))])
 			logger.Printf("Subject: %s", content.Subject)
-			// Use content.To, content.Subject, content.Text as needed
 		}
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	}
+}
+
+// Helper to avoid slicing out of bounds
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // extractTextContent pulls the text version of the email from the raw email message.
@@ -113,12 +144,14 @@ func extractTextContent(emailRaw string, logger *log.Logger) (EmailContent, erro
 			if strings.HasPrefix(partContentType, "text/plain") {
 				content, err := io.ReadAll(part)
 				if err != nil {
+					logger.Printf("Error reading text/plain part: %v", err)
 					return EmailContent{}, fmt.Errorf("error reading text/plain part: %v", err)
 				}
 				textContent = string(content)
 			}
 		}
 		if textContent != "" {
+			logger.Printf("Extracted text content length: %d", len(textContent))
 			return EmailContent{To: to, Subject: subject, Text: textContent}, nil
 		}
 		return EmailContent{}, fmt.Errorf("no text/plain part found")

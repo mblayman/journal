@@ -142,8 +142,8 @@ func TestWebhookHandler(t *testing.T) {
 	}
 
 	logLines := strings.Split(strings.TrimSpace(logOutput), "\n")
-	if len(logLines) != 5 {
-		t.Errorf("Expected exactly 5 log lines (2 debug, To, Text Content, Subject), got %d: %v", len(logLines), logLines)
+	if len(logLines) != 7 {
+		t.Errorf("Expected exactly 7 log lines (2 debug, To, Text Content, Subject), got %d: %v", len(logLines), logLines)
 	}
 }
 
