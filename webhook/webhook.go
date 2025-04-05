@@ -144,13 +144,5 @@ func extractContent(emailRaw string, logger *log.Logger) (model.EmailContent, er
 		return model.EmailContent{}, fmt.Errorf("no text/plain part found")
 	}
 
-	if mediaType == "text/plain" {
-		content, err := io.ReadAll(msg.Body)
-		if err != nil {
-			return model.EmailContent{}, fmt.Errorf("failed to read text body: %v", err)
-		}
-		return model.EmailContent{To: to, Subject: subject, Text: string(content)}, nil
-	}
-
 	return model.EmailContent{}, fmt.Errorf("unsupported Content-Type: %s", mediaType)
 }
