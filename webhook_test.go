@@ -95,11 +95,6 @@ func TestWebhookHandler(t *testing.T) {
 		t.Fatalf("Failed to set boundary: %v", err)
 	}
 
-	err = writer.WriteField("to", "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>")
-	if err != nil {
-		t.Fatalf("Failed to write to field: %v", err)
-	}
-
 	emailPart := strings.SplitN(rawPayload, `Content-Disposition: form-data; name="email"`, 2)[1]
 	emailPart = strings.SplitN(emailPart, "--xYzZY--", 2)[0]
 	err = writer.WriteField("email", strings.TrimSpace(emailPart))
@@ -141,9 +136,14 @@ func TestWebhookHandler(t *testing.T) {
 		t.Errorf("Expected logger output to contain %q, got %q", expectedTextSnippet, logOutput)
 	}
 
+	expectedSubject := "Subject: Re: It's Wednesday, Mar. 26, 2025. How are you?"
+	if !strings.Contains(logOutput, expectedSubject) {
+		t.Errorf("Expected logger output to contain %q, got %q", expectedSubject, logOutput)
+	}
+
 	logLines := strings.Split(strings.TrimSpace(logOutput), "\n")
-	if len(logLines) != 4 {
-		t.Errorf("Expected exactly 4 log lines (2 debug, To, Text Content), got %d: %v", len(logLines), logLines)
+	if len(logLines) != 5 {
+		t.Errorf("Expected exactly 5 log lines (2 debug, To, Text Content, Subject), got %d: %v", len(logLines), logLines)
 	}
 }
 

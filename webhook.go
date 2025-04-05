@@ -12,6 +12,12 @@ import (
 	"strings"
 )
 
+type EmailContent struct {
+	To      string
+	Text    string
+	Subject string
+}
+
 func webhookHandler(username, password string, logger *log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -42,30 +48,22 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 		}
 		defer r.Body.Close()
 
-		var to string
-		if toValues, ok := form.Value["to"]; !ok || len(toValues) == 0 {
-			logger.Printf("No to field found in webhook")
-			http.Error(w, "Missing to field", http.StatusBadRequest)
-			return
-		} else {
-			to = toValues[0]
-		}
-
 		if emailValues, ok := form.Value["email"]; !ok || len(emailValues) == 0 {
 			logger.Printf("No email field found in webhook")
 			http.Error(w, "Missing email field", http.StatusBadRequest)
 			return
 		} else {
-			text, err := extractTextContent(emailValues[0], logger)
+			content, err := extractTextContent(emailValues[0], logger)
 			if err != nil {
-				logger.Printf("Error extracting text: %v", err)
+				logger.Printf("Error extracting content: %v", err)
 				http.Error(w, "Error processing email", http.StatusInternalServerError)
 				return
 			}
-			logger.Printf("To: %s", to)
-			// Replace newlines with spaces to keep it one line
-			singleLineText := strings.ReplaceAll(text, "\n", " ")
+			logger.Printf("To: %s", content.To)
+			singleLineText := strings.ReplaceAll(content.Text, "\n", " ")
 			logger.Printf("Text Content: %s", singleLineText)
+			logger.Printf("Subject: %s", content.Subject)
+			// Use content.To, content.Subject, content.Text as needed
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -74,27 +72,30 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 }
 
 // extractTextContent pulls the text version of the email from the raw email message.
-func extractTextContent(emailRaw string, logger *log.Logger) (string, error) {
+func extractTextContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader([]byte(emailRaw)))
 	if err != nil {
-		return "", fmt.Errorf("failed to parse email: %v", err)
+		return EmailContent{}, fmt.Errorf("failed to parse email: %v", err)
 	}
+
+	to := msg.Header.Get("To")
+	subject := msg.Header.Get("Subject")
 
 	contentType := msg.Header.Get("Content-Type")
 	mediaType, params, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		return "", fmt.Errorf("invalid Content-Type: %v", err)
+		return EmailContent{}, fmt.Errorf("invalid Content-Type: %v", err)
 	}
 
 	if mediaType == "multipart/alternative" {
 		boundary := params["boundary"]
 		if boundary == "" {
-			return "", fmt.Errorf("missing boundary in multipart/alternative")
+			return EmailContent{}, fmt.Errorf("missing boundary in multipart/alternative")
 		}
 
 		body, err := io.ReadAll(msg.Body)
 		if err != nil {
-			return "", fmt.Errorf("failed to read email body: %v", err)
+			return EmailContent{}, fmt.Errorf("failed to read email body: %v", err)
 		}
 
 		var textContent string
@@ -105,23 +106,31 @@ func extractTextContent(emailRaw string, logger *log.Logger) (string, error) {
 				break
 			}
 			if err != nil {
-				return "", fmt.Errorf("error reading multipart part: %v", err)
+				return EmailContent{}, fmt.Errorf("error reading multipart part: %v", err)
 			}
 			partContentType := part.Header.Get("Content-Type")
 			logger.Printf("Found part with Content-Type: %s", partContentType)
 			if strings.HasPrefix(partContentType, "text/plain") {
 				content, err := io.ReadAll(part)
 				if err != nil {
-					return "", fmt.Errorf("error reading text/plain part: %v", err)
+					return EmailContent{}, fmt.Errorf("error reading text/plain part: %v", err)
 				}
 				textContent = string(content)
 			}
 		}
 		if textContent != "" {
-			return textContent, nil
+			return EmailContent{To: to, Subject: subject, Text: textContent}, nil
 		}
-		return "", fmt.Errorf("no text/plain part found")
+		return EmailContent{}, fmt.Errorf("no text/plain part found")
 	}
 
-	return "", fmt.Errorf("unsupported Content-Type: %s", mediaType)
+	if mediaType == "text/plain" {
+		content, err := io.ReadAll(msg.Body)
+		if err != nil {
+			return EmailContent{}, fmt.Errorf("failed to read text body: %v", err)
+		}
+		return EmailContent{To: to, Subject: subject, Text: string(content)}, nil
+	}
+
+	return EmailContent{}, fmt.Errorf("unsupported Content-Type: %s", mediaType)
 }
