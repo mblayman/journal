@@ -13,17 +13,13 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-)
 
-type EmailContent struct {
-	To      string
-	Text    string
-	Subject string
-}
+	"github.com/mblayman/journal/model"
+)
 
 // EmailContentProcessor is the callback that does all the necessary
 // processing on the (relatively) raw email data.
-type EmailContentProcessor func(EmailContent)
+type EmailContentProcessor func(model.EmailContent)
 
 func webhookHandler(username, password string, processor EmailContentProcessor, logger *log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -96,10 +92,10 @@ func webhookHandler(username, password string, processor EmailContentProcessor, 
 }
 
 // extractContent pulls the details from the raw email message.
-func extractContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
+func extractContent(emailRaw string, logger *log.Logger) (model.EmailContent, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader([]byte(emailRaw)))
 	if err != nil {
-		return EmailContent{}, fmt.Errorf("failed to parse email: %v", err)
+		return model.EmailContent{}, fmt.Errorf("failed to parse email: %v", err)
 	}
 
 	to := msg.Header.Get("To")
@@ -108,18 +104,18 @@ func extractContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
 	contentType := msg.Header.Get("Content-Type")
 	mediaType, params, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		return EmailContent{}, fmt.Errorf("invalid Content-Type: %v", err)
+		return model.EmailContent{}, fmt.Errorf("invalid Content-Type: %v", err)
 	}
 
 	if mediaType == "multipart/alternative" {
 		boundary := params["boundary"]
 		if boundary == "" {
-			return EmailContent{}, fmt.Errorf("missing boundary in multipart/alternative")
+			return model.EmailContent{}, fmt.Errorf("missing boundary in multipart/alternative")
 		}
 
 		body, err := io.ReadAll(msg.Body)
 		if err != nil {
-			return EmailContent{}, fmt.Errorf("failed to read email body: %v", err)
+			return model.EmailContent{}, fmt.Errorf("failed to read email body: %v", err)
 		}
 
 		var textContent string
@@ -130,7 +126,7 @@ func extractContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
 				break
 			}
 			if err != nil {
-				return EmailContent{}, fmt.Errorf("error reading multipart part: %v", err)
+				return model.EmailContent{}, fmt.Errorf("error reading multipart part: %v", err)
 			}
 			partContentType := part.Header.Get("Content-Type")
 			logger.Printf("Found part with Content-Type: %s", partContentType)
@@ -138,25 +134,25 @@ func extractContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
 				content, err := io.ReadAll(part)
 				if err != nil {
 					logger.Printf("Error reading text/plain part: %v", err)
-					return EmailContent{}, fmt.Errorf("error reading text/plain part: %v", err)
+					return model.EmailContent{}, fmt.Errorf("error reading text/plain part: %v", err)
 				}
 				textContent = string(content)
 			}
 		}
 		if textContent != "" {
 			logger.Printf("Extracted text content length: %d", len(textContent))
-			return EmailContent{To: to, Subject: subject, Text: textContent}, nil
+			return model.EmailContent{To: to, Subject: subject, Text: textContent}, nil
 		}
-		return EmailContent{}, fmt.Errorf("no text/plain part found")
+		return model.EmailContent{}, fmt.Errorf("no text/plain part found")
 	}
 
 	if mediaType == "text/plain" {
 		content, err := io.ReadAll(msg.Body)
 		if err != nil {
-			return EmailContent{}, fmt.Errorf("failed to read text body: %v", err)
+			return model.EmailContent{}, fmt.Errorf("failed to read text body: %v", err)
 		}
-		return EmailContent{To: to, Subject: subject, Text: string(content)}, nil
+		return model.EmailContent{To: to, Subject: subject, Text: string(content)}, nil
 	}
 
-	return EmailContent{}, fmt.Errorf("unsupported Content-Type: %s", mediaType)
+	return model.EmailContent{}, fmt.Errorf("unsupported Content-Type: %s", mediaType)
 }

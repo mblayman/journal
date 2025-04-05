@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/mblayman/journal/model"
 )
 
 const rawPayload = `--xYzZY
@@ -85,7 +87,7 @@ func TestWebhookHandler(t *testing.T) {
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
 
-	processor := func(emailContent EmailContent) {
+	processor := func(emailContent model.EmailContent) {
 		expectedTo := "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>"
 		if emailContent.To != expectedTo {
 			t.Errorf("Expected output to contain %q, got %q", expectedTo, emailContent.To)
@@ -146,7 +148,7 @@ func TestWebhookHandlerUnauthorized(t *testing.T) {
 	password := "testpass"
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
-	processor := func(EmailContent) {}
+	processor := func(model.EmailContent) {}
 	handler := webhookHandler(username, password, processor, logger)
 
 	// Create a request without auth
@@ -168,7 +170,7 @@ func TestWebhookHandlerMethodNotAllowed(t *testing.T) {
 	password := "testpass"
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
-	processor := func(EmailContent) {}
+	processor := func(model.EmailContent) {}
 	handler := webhookHandler(username, password, processor, logger)
 
 	req := httptest.NewRequest(http.MethodGet, "/webhook", nil)
