@@ -67,12 +67,16 @@ func main() {
 		logger.Println("Sentry is disabled.")
 	}
 
+	requiredToAddress := os.Getenv("REQUIRED_TO_ADDRESS")
+	if requiredToAddress == "" {
+		log.Fatal("REQUIRED_TO_ADDRESS not set.")
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 	username, password := getWebhookAuth()
-	// TODO: pass in required to address
-	processor := entries.MakeEmailContentProcessor("")
+	processor := entries.MakeEmailContentProcessor(requiredToAddress, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
 	logger.Println("Server starting on port 8080...")
