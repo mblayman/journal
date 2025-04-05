@@ -69,7 +69,9 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 	username, password := getWebhookAuth()
-	mux.HandleFunc("/webhook", webhookHandler(username, password, logger))
+	// TODO: implement the real processor
+	processor := func(EmailContent) {}
+	mux.HandleFunc("/webhook", webhookHandler(username, password, processor, logger))
 
 	logger.Println("Server starting on port 8080...")
 	err = http.ListenAndServe(":8080", mux)

@@ -21,7 +21,11 @@ type EmailContent struct {
 	Subject string
 }
 
-func webhookHandler(username, password string, logger *log.Logger) http.HandlerFunc {
+// EmailContentProcessor is the callback that does all the necessary
+// processing on the (relatively) raw email data.
+type EmailContentProcessor func(EmailContent)
+
+func webhookHandler(username, password string, processor EmailContentProcessor, logger *log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -77,16 +81,13 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 			http.Error(w, "Missing email field", http.StatusBadRequest)
 			return
 		} else {
-			content, err := extractTextContent(emailValues[0], logger)
+			content, err := extractContent(emailValues[0], logger)
 			if err != nil {
 				logger.Printf("Error extracting content: %v", err)
 				http.Error(w, "Error processing email", http.StatusInternalServerError)
 				return
 			}
-			logger.Printf("To: %s", content.To)
-			singleLineText := strings.ReplaceAll(content.Text, "\n", " ")
-			logger.Printf("Text Content (length=%d): %s", len(singleLineText), singleLineText[:min(100, len(singleLineText))])
-			logger.Printf("Subject: %s", content.Subject)
+			processor(content)
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -94,16 +95,8 @@ func webhookHandler(username, password string, logger *log.Logger) http.HandlerF
 	}
 }
 
-// Helper to avoid slicing out of bounds
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-// extractTextContent pulls the text version of the email from the raw email message.
-func extractTextContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
+// extractContent pulls the details from the raw email message.
+func extractContent(emailRaw string, logger *log.Logger) (EmailContent, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader([]byte(emailRaw)))
 	if err != nil {
 		return EmailContent{}, fmt.Errorf("failed to parse email: %v", err)

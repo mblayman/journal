@@ -85,7 +85,23 @@ func TestWebhookHandler(t *testing.T) {
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
 
-	handler := webhookHandler(username, password, logger)
+	processor := func(emailContent EmailContent) {
+		expectedTo := "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>"
+		if emailContent.To != expectedTo {
+			t.Errorf("Expected output to contain %q, got %q", expectedTo, emailContent.To)
+		}
+		expectedSubject := "Re: It's Wednesday, Mar. 26, 2025. How are you?"
+		if emailContent.Subject != expectedSubject {
+			t.Errorf("Expected output to contain %q, got %q", expectedSubject, emailContent.Subject)
+		}
+		expectedTextSnippet := "I got up this morning at 8:30 and brushed my teeth"
+		if !strings.Contains(emailContent.Text, expectedTextSnippet) {
+			t.Errorf("Expected output to contain %q, got %q", expectedTextSnippet, emailContent.Text)
+		}
+
+	}
+
+	handler := webhookHandler(username, password, processor, logger)
 
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
@@ -123,28 +139,6 @@ func TestWebhookHandler(t *testing.T) {
 	if recorder.Body.String() != "ok" {
 		t.Errorf("Expected body 'ok', got %q", recorder.Body.String())
 	}
-
-	logOutput := logBuf.String()
-	t.Logf("Logger output:\n%s", logOutput)
-	expectedTo := "To: JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>"
-	if !strings.Contains(logOutput, expectedTo) {
-		t.Errorf("Expected logger output to contain %q, got %q", expectedTo, logOutput)
-	}
-
-	expectedTextSnippet := "I got up this morning at 8:30 and brushed my teeth"
-	if !strings.Contains(logOutput, expectedTextSnippet) {
-		t.Errorf("Expected logger output to contain %q, got %q", expectedTextSnippet, logOutput)
-	}
-
-	expectedSubject := "Subject: Re: It's Wednesday, Mar. 26, 2025. How are you?"
-	if !strings.Contains(logOutput, expectedSubject) {
-		t.Errorf("Expected logger output to contain %q, got %q", expectedSubject, logOutput)
-	}
-
-	logLines := strings.Split(strings.TrimSpace(logOutput), "\n")
-	if len(logLines) != 7 {
-		t.Errorf("Expected exactly 7 log lines (2 debug, To, Text Content, Subject), got %d: %v", len(logLines), logLines)
-	}
 }
 
 func TestWebhookHandlerUnauthorized(t *testing.T) {
@@ -152,7 +146,8 @@ func TestWebhookHandlerUnauthorized(t *testing.T) {
 	password := "testpass"
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
-	handler := webhookHandler(username, password, logger)
+	processor := func(EmailContent) {}
+	handler := webhookHandler(username, password, processor, logger)
 
 	// Create a request without auth
 	req := httptest.NewRequest(http.MethodPost, "/webhook", nil)
@@ -173,7 +168,8 @@ func TestWebhookHandlerMethodNotAllowed(t *testing.T) {
 	password := "testpass"
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", log.LstdFlags)
-	handler := webhookHandler(username, password, logger)
+	processor := func(EmailContent) {}
+	handler := webhookHandler(username, password, processor, logger)
 
 	req := httptest.NewRequest(http.MethodGet, "/webhook", nil)
 	req.SetBasicAuth(username, password)
