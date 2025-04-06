@@ -7,7 +7,6 @@ from journal.core.views import index, up
 urlpatterns = [
     path("", index, name="index"),
     path("up", up, name="up"),
-    path("anymail/", include("anymail.urls")),
     path(f"{settings.ADMIN_URL_PATH_TOKEN}/admin/", admin.site.urls),
 ]
 
