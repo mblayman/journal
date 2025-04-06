@@ -1,6 +1,7 @@
 package entries
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"strings"
@@ -9,7 +10,7 @@ import (
 	"github.com/mblayman/journal/model"
 )
 
-func MakeEmailContentProcessor(requiredToAddress string, logger *log.Logger) model.EmailContentProcessor {
+func MakeEmailContentProcessor(requiredToAddress string, db *sql.DB, logger *log.Logger) model.EmailContentProcessor {
 	return func(emailContent model.EmailContent) {
 		if emailContent.ToAddress() != requiredToAddress {
 			logger.Printf("Invalid To address: %s", emailContent.ToAddress())
@@ -22,7 +23,20 @@ func MakeEmailContentProcessor(requiredToAddress string, logger *log.Logger) mod
 			return
 		}
 
-		logger.Printf("Parsed date from Subject: %s", date.Format(time.RFC3339))
+		replyText := emailContent.Reply()
+		userID := int64(1)                   // Fixed user_id value
+		dateStr := date.Format("2006-01-02") // SQLite date format (YYYY-MM-DD)
+		query := `
+            INSERT INTO entries_entry (user_id, "when", body)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id, "when") DO UPDATE SET body = excluded.body`
+		_, err = db.Exec(query, userID, dateStr, replyText)
+		if err != nil {
+			logger.Printf("Failed to upsert entry for user %d on %s: %v", userID, dateStr, err)
+			return
+		}
+
+		logger.Printf("Upserted entry for user %d on %s", userID, dateStr)
 	}
 }
 

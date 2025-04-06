@@ -1,12 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"embed"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mblayman/journal/entries"
 	"github.com/mblayman/journal/webhook"
+	_ "modernc.org/sqlite"
 )
 
 //go:embed go_templates
@@ -72,11 +75,22 @@ func main() {
 		log.Fatal("REQUIRED_TO_ADDRESS not set.")
 	}
 
+	dbPath := "./db.sqlite3"
+	if dir := os.Getenv("DB_DIR"); dir != "" {
+		dbPath = filepath.Join(dir, "db.sqlite3")
+	}
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		log.Fatalf("Failed to open database: %v", err)
+	}
+	defer db.Close()
+	logger.Printf("Opened database at %s.", dbPath)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 	username, password := getWebhookAuth()
-	processor := entries.MakeEmailContentProcessor(requiredToAddress, logger)
+	processor := entries.MakeEmailContentProcessor(requiredToAddress, db, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
 	logger.Println("Server starting on port 8080...")
