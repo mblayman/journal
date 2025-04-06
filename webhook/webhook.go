@@ -9,10 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/mail"
-	"os"
-	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/mblayman/journal/model"
 )
@@ -32,28 +29,6 @@ func WebhookHandler(username, password string, processor model.EmailContentProce
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-
-		// Read the raw request body
-		bodyBytes, err := io.ReadAll(r.Body)
-		if err != nil {
-			logger.Printf("Error reading request body: %v", err)
-			http.Error(w, "Bad request", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
-
-		// Save the request body to a file
-		filename := fmt.Sprintf("webhook_%s.bin", time.Now().Format("20060102_150405.999"))
-		filePath := filepath.Join("/var/db", filename)
-		if err := os.WriteFile(filePath, bodyBytes, 0644); err != nil {
-			logger.Printf("Error writing request body to file %s: %v", filePath, err)
-			// Don’t fail the request, just log the error
-		} else {
-			logger.Printf("Saved request body to %s", filePath)
-		}
-
-		// Reconstruct the body for processing
-		r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 		mediaType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 		if err != nil || mediaType != "multipart/form-data" {
@@ -127,7 +102,6 @@ func extractContent(emailRaw string, logger *log.Logger) (model.EmailContent, er
 				return model.EmailContent{}, fmt.Errorf("error reading multipart part: %v", err)
 			}
 			partContentType := part.Header.Get("Content-Type")
-			logger.Printf("Found part with Content-Type: %s", partContentType)
 			if strings.HasPrefix(partContentType, "text/plain") {
 				content, err := io.ReadAll(part)
 				if err != nil {
@@ -138,7 +112,6 @@ func extractContent(emailRaw string, logger *log.Logger) (model.EmailContent, er
 			}
 		}
 		if textContent != "" {
-			logger.Printf("Extracted text content length: %d", len(textContent))
 			return model.EmailContent{To: to, Subject: subject, Text: textContent}, nil
 		}
 		return model.EmailContent{}, fmt.Errorf("no text/plain part found")
