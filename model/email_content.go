@@ -1,6 +1,8 @@
 package model
 
-import "strings"
+import (
+	"strings"
+)
 
 // EmailContent is the data extracted from webhook responses.
 type EmailContent struct {
@@ -20,7 +22,7 @@ func (emailContent *EmailContent) ToAddress() string {
 }
 
 // Reply extracts the reply content from the email text, excluding the quoted original message.
-// It joins lines within paragraphs and preserves blank lines between them, splitting at the ToAddress line.
+// It joins lines within paragraphs and stops before the paragraph containing ToAddress.
 func (emailContent *EmailContent) Reply() string {
 	lines := strings.Split(emailContent.Text, "\n")
 	toAddress := emailContent.ToAddress()
@@ -28,23 +30,22 @@ func (emailContent *EmailContent) Reply() string {
 	var currentParagraph []string
 
 	for _, line := range lines {
-		if strings.Contains(line, toAddress) {
-			break
-		}
 		trimmedLine := strings.TrimSpace(line)
-		// Blank line indicates end of a paragraph.
 		if trimmedLine == "" {
+			// Blank line ends a paragraph
 			if len(currentParagraph) > 0 {
-				paragraphs = append(paragraphs, strings.Join(currentParagraph, " "))
+				joinedParagraph := strings.Join(currentParagraph, " ")
+				// Check if this paragraph contains toAddress
+				if strings.Contains(joinedParagraph, toAddress) {
+					// Stop here, excluding this paragraph
+					break
+				}
+				paragraphs = append(paragraphs, joinedParagraph)
 				currentParagraph = nil
 			}
 		} else {
 			currentParagraph = append(currentParagraph, trimmedLine)
 		}
-	}
-
-	if len(currentParagraph) > 0 {
-		paragraphs = append(paragraphs, strings.Join(currentParagraph, " "))
 	}
 
 	return strings.Join(paragraphs, "\n\n")

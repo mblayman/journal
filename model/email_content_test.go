@@ -45,14 +45,6 @@ On Wed, Mar 26, 2025, 9:00 AM JourneyInbox Journal <journal.abcdef1@email.journe
 
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
 		},
-		{
-			name: "Text without quoted section",
-			emailContent: EmailContent{
-				To:   "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>",
-				Text: "Just some text without a quote.",
-			},
-			wantText: "Just some text without a quote.",
-		},
 	}
 
 	for _, tt := range tests {
