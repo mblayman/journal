@@ -17,11 +17,16 @@ func TestMakeEmailContentProcessor(t *testing.T) {
 		name         string
 		requiredTo   string
 		emailContent model.EmailContent
-		expectedLog  string
-		wantBody     string // Expected body after upsert
+		preInsert    *struct { // Optional pre-inserted row
+			userID int64
+			when   string
+			body   string
+		}
+		expectedLog string
+		wantBody    string // Expected body after upsert
 	}{
 		{
-			name:       "Matching To address with valid Subject and Text",
+			name:       "Matching To address with valid Subject and Text (insert)",
 			requiredTo: "journal.abcdef1@email.journeyinbox.com",
 			emailContent: model.EmailContent{
 				To:      "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>",
@@ -44,6 +49,30 @@ On Wed, Mar 26, 2025, 9:00 AM JourneyInbox Journal <journal.abcdef1@email.journe
 			wantBody: `I got up this morning at 8:30 and brushed my teeth, then left to go to Cafe Ibiza to meet with Jared. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+		},
+		{
+			name:       "Matching To address with valid Subject and Text (update)",
+			requiredTo: "journal.abcdef1@email.journeyinbox.com",
+			emailContent: model.EmailContent{
+				To:      "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>",
+				Subject: "It's Wednesday, Mar. 26, 2025. How are you?",
+				Text: `Updated entry for March 26th. I had coffee instead of tea today.
+
+On Wed, Mar 26, 2025, 9:00 AM JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com> wrote:
+> Reply to this prompt to update your journal.
+>`,
+			},
+			preInsert: &struct {
+				userID int64
+				when   string
+				body   string
+			}{
+				userID: 1,
+				when:   "2025-03-26",
+				body:   "Original entry for March 26th.",
+			},
+			expectedLog: "Upserted entry for user 1 on 2025-03-26",
+			wantBody:    "Updated entry for March 26th. I had coffee instead of tea today.",
 		},
 		{
 			name:       "Non-matching To address with valid Subject and Text",
@@ -89,6 +118,15 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 )`
 			if _, err := db.Exec(createTable); err != nil {
 				t.Fatalf("Failed to create table: %v", err)
+			}
+
+			// Pre-insert a row if specified
+			if tt.preInsert != nil {
+				_, err := db.Exec(`INSERT INTO entries_entry (user_id, "when", body) VALUES (?, ?, ?)`,
+					tt.preInsert.userID, tt.preInsert.when, tt.preInsert.body)
+				if err != nil {
+					t.Fatalf("Failed to pre-insert row: %v", err)
+				}
 			}
 
 			// Set up logger
