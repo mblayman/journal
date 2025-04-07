@@ -93,7 +93,7 @@ func main() {
 	processor := entries.MakeEmailContentProcessor(requiredToAddress, db, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
-	entries.RunDailyEmailTask(logger)
+	entries.RunDailyEmailTask(db, logger)
 
 	logger.Println("Server starting on port 8080...")
 	err = http.ListenAndServe(":8080", mux)
