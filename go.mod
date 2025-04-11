@@ -3,6 +3,7 @@ module github.com/mblayman/journal
 go 1.24.1
 
 require (
+	github.com/dustin/go-humanize v1.0.1
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/joho/godotenv v1.5.1
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
@@ -10,7 +11,6 @@ require (
 )
 
 require (
-	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect

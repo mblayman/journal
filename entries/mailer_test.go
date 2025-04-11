@@ -64,6 +64,7 @@ func TestSendDailyEmails(t *testing.T) {
 			}
 			defer db.Close()
 
+			// Create entries_prompt table
 			_, err = db.Exec(`
                 CREATE TABLE entries_prompt (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,12 +73,35 @@ func TestSendDailyEmails(t *testing.T) {
                     user_id BIGINT NOT NULL
                 )`)
 			if err != nil {
-				t.Fatalf("Failed to create table: %v", err)
+				t.Fatalf("Failed to create entries_prompt table: %v", err)
 			}
 
-			// Pre-insert prompts
+			// Create entries_entry table
+			_, err = db.Exec(`
+                CREATE TABLE entries_entry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "when" DATE NOT NULL,
+                    body TEXT NOT NULL,
+                    user_id BIGINT NOT NULL
+                )`)
+			if err != nil {
+				t.Fatalf("Failed to create entries_entry table: %v", err)
+			}
+
+			// Pre-insert a sample entry into entries_entry for user_id=1
+			_, err = db.Exec(`
+    INSERT INTO entries_entry ("when", body, user_id) 
+    VALUES (?, ?, ?)`,
+				"2025-04-01", "Test line 1\nTest line 2\n\nTest line 3", 1)
+			if err != nil {
+				t.Fatalf("Failed to pre-insert entry into entries_entry: %v", err)
+			}
+
+			// Pre-insert prompts into entries_prompt
 			for _, p := range tt.preInsert {
-				_, err := db.Exec(`INSERT INTO entries_prompt ("when", message_id, user_id) VALUES (?, ?, ?)`,
+				_, err := db.Exec(`
+                    INSERT INTO entries_prompt ("when", message_id, user_id) 
+                    VALUES (?, ?, ?)`,
 					p.when, p.messageID, p.userID)
 				if err != nil {
 					t.Fatalf("Failed to pre-insert prompt: %v", err)
@@ -88,8 +112,8 @@ func TestSendDailyEmails(t *testing.T) {
 			var logBuf bytes.Buffer
 			logger := log.New(&logBuf, "", 0)
 			mockGateway := &MockEmailGateway{}
-			requiredToAddress := "test@example.com" // Dummy value for testing
-			mattEmailAddress := "matt@example.com"  // Dummy value for testing
+			requiredToAddress := "test@example.com"
+			mattEmailAddress := "matt@example.com"
 
 			// Run the function
 			SendDailyEmails(db, mockGateway, requiredToAddress, mattEmailAddress, logger, tt.currentTime)

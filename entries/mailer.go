@@ -1,10 +1,21 @@
 package entries
 
 import (
+	"bytes"
 	"database/sql"
+	"embed"
+	"html/template"
 	"log"
+	"math/rand"
+	"strings"
 	"time"
+
+	"github.com/dustin/go-humanize"
 )
+
+//go:embed templates
+var templates embed.FS
+var promptTmpl = template.Must(template.ParseFS(templates, "templates/prompt.html"))
 
 // EmailGateway defines the interface for sending email prompts.
 type EmailGateway interface {
@@ -33,6 +44,96 @@ func RunDailyEmailTask(db *sql.DB, emailGateway EmailGateway, requiredToAddress,
 			SendDailyEmails(db, emailGateway, requiredToAddress, mattEmailAddress, logger, time.Now().In(loc))
 		}
 	}()
+}
+
+// linebreaks mimics Django's |linebreaks filter, converting newlines to HTML tags.
+func linebreaks(text string) string {
+	// Split into paragraphs by double newlines
+	paragraphs := strings.Split(strings.TrimSpace(text), "\n\n")
+	if len(paragraphs) == 0 {
+		return ""
+	}
+
+	var htmlParts []string
+	for _, para := range paragraphs {
+		if para == "" {
+			continue
+		}
+		// Replace single newlines within a paragraph with <br>
+		lines := strings.Split(para, "\n")
+		trimmedLines := make([]string, 0, len(lines))
+		for _, line := range lines {
+			if trimmed := strings.TrimSpace(line); trimmed != "" {
+				trimmedLines = append(trimmedLines, trimmed)
+			}
+		}
+		if len(trimmedLines) == 0 {
+			continue
+		}
+		paraHTML := strings.Join(trimmedLines, "<br>")
+		htmlParts = append(htmlParts, "<p>"+paraHTML+"</p>")
+	}
+
+	return strings.Join(htmlParts, "")
+}
+
+// createPromptBody generates the email body using a random entry for user_id=1.
+func createPromptBody(db *sql.DB, today time.Time, logger *log.Logger) (string, error) {
+	const userID = 1
+
+	// Count entries for user_id=1
+	var count int
+	err := db.QueryRow(`SELECT COUNT(*) FROM entries_entry WHERE user_id = ?`, userID).Scan(&count)
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		logger.Printf("No entries found for user_id=%d", userID)
+		return "<p>Reply to this prompt to update your journal.</p>", nil // Fallback
+	}
+
+	// Pick a random entry (OFFSET is 0-based)
+	offset := rand.Intn(count)
+	var whenStr, body string
+	err = db.QueryRow(`
+        SELECT strftime('%Y-%m-%d', "when"), body 
+        FROM entries_entry 
+        WHERE user_id = ? 
+        ORDER BY "when" 
+        LIMIT 1 OFFSET ?`, userID, offset).Scan(&whenStr, &body)
+	if err != nil {
+		return "", err
+	}
+
+	// Parse the entry's "when" date
+	when, err := time.Parse("2006-01-02", whenStr)
+	if err != nil {
+		logger.Printf("Failed to parse entry date %q: %v", whenStr, err)
+		return "", err
+	}
+
+	// Calculate delta using go-humanize
+	delta := humanize.RelTime(when, today, "ago", "")
+
+	// Convert body newlines to HTML
+	bodyHTML := linebreaks(body)
+
+	// Render the template
+	data := struct {
+		When  time.Time
+		Delta string
+		Body  template.HTML // Allows raw HTML from entry body
+	}{
+		When:  when,
+		Delta: delta,
+		Body:  template.HTML(bodyHTML),
+	}
+	var buf bytes.Buffer
+	err = promptTmpl.Execute(&buf, data)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 // SendDailyEmails sends prompt emails to users, catching up on any missed days.
@@ -72,7 +173,13 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, m
 		fromName := "JourneyInbox Journal"
 		fromEmail := requiredToAddress
 		subject := "It’s " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
-		body := "<p>Reply to this prompt to update your journal.</p>"
+
+		// Generate body with random entry
+		body, err := createPromptBody(db, today, logger)
+		if err != nil {
+			logger.Printf("Failed to create prompt body for %s: %v", date.Format("2006-01-02"), err)
+			continue
+		}
 
 		// Send email via gateway
 		messageID, err := emailGateway.SendPrompt(toName, toEmail, fromName, fromEmail, subject, body)
