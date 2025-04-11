@@ -75,6 +75,11 @@ func main() {
 		log.Fatal("REQUIRED_TO_ADDRESS not set.")
 	}
 
+	mattEmailAddress := os.Getenv("MATT_EMAIL_ADDRESS")
+	if mattEmailAddress == "" {
+		log.Fatal("MATT_EMAIL_ADDRESS not set.")
+	}
+
 	dbPath := "./db.sqlite3"
 	if dir := os.Getenv("DB_DIR"); dir != "" {
 		dbPath = filepath.Join(dir, "db.sqlite3")
@@ -100,7 +105,7 @@ func main() {
 	processor := entries.MakeEmailContentProcessor(requiredToAddress, db, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
-	entries.RunDailyEmailTask(db, emailGateway, logger)
+	entries.RunDailyEmailTask(db, emailGateway, requiredToAddress, mattEmailAddress, logger)
 
 	logger.Println("Server starting on port 8080...")
 	err = http.ListenAndServe(":8080", mux)

@@ -88,9 +88,11 @@ func TestSendDailyEmails(t *testing.T) {
 			var logBuf bytes.Buffer
 			logger := log.New(&logBuf, "", 0)
 			mockGateway := &MockEmailGateway{}
+			requiredToAddress := "test@example.com" // Dummy value for testing
+			mattEmailAddress := "matt@example.com"  // Dummy value for testing
 
 			// Run the function
-			SendDailyEmails(db, mockGateway, logger, tt.currentTime)
+			SendDailyEmails(db, mockGateway, requiredToAddress, mattEmailAddress, logger, tt.currentTime)
 
 			// Check number of prompts sent
 			logOutput := logBuf.String()
