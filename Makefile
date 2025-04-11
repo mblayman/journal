@@ -21,3 +21,6 @@ build:
 
 run: build
 	./app
+
+run-prod:
+	@env $$(kamal secrets print) $(MAKE) run
