@@ -86,6 +86,13 @@ func main() {
 	defer db.Close()
 	logger.Printf("Opened database at %s.", dbPath)
 
+	// Email gateway setup
+	sendgridAPIKey := os.Getenv("SENDGRID_API_KEY")
+	if sendgridAPIKey == "" {
+		log.Fatal("SENDGRID_API_KEY not set.")
+	}
+	emailGateway := entries.NewSendGridGateway(sendgridAPIKey)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
@@ -93,7 +100,7 @@ func main() {
 	processor := entries.MakeEmailContentProcessor(requiredToAddress, db, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
-	entries.RunDailyEmailTask(db, logger)
+	entries.RunDailyEmailTask(db, emailGateway, logger)
 
 	logger.Println("Server starting on port 8080...")
 	err = http.ListenAndServe(":8080", mux)

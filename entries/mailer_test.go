@@ -8,6 +8,16 @@ import (
 	"time"
 )
 
+// MockEmailGateway is a testable implementation of EmailGateway.
+type MockEmailGateway struct {
+	sentPrompts []struct{ subject, body string }
+}
+
+func (m *MockEmailGateway) SendPrompt(toName, toEmail, fromName, fromEmail, subject, body string) (string, error) {
+	m.sentPrompts = append(m.sentPrompts, struct{ subject, body string }{subject, body})
+	return "mock-msg-" + time.Now().Format("20060102150405"), nil // Dummy message ID
+}
+
 func TestSendDailyEmails(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -54,7 +64,6 @@ func TestSendDailyEmails(t *testing.T) {
 			}
 			defer db.Close()
 
-			// Create entries_prompt table
 			_, err = db.Exec(`
                 CREATE TABLE entries_prompt (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +75,7 @@ func TestSendDailyEmails(t *testing.T) {
 				t.Fatalf("Failed to create table: %v", err)
 			}
 
-			// Pre-insert prompts (always present)
+			// Pre-insert prompts
 			for _, p := range tt.preInsert {
 				_, err := db.Exec(`INSERT INTO entries_prompt ("when", message_id, user_id) VALUES (?, ?, ?)`,
 					p.when, p.messageID, p.userID)
@@ -75,18 +84,22 @@ func TestSendDailyEmails(t *testing.T) {
 				}
 			}
 
-			// Mock logger
+			// Mock logger and gateway
 			var logBuf bytes.Buffer
-			logger := log.New(&logBuf, "", 0) // No timestamp prefix
+			logger := log.New(&logBuf, "", 0)
+			mockGateway := &MockEmailGateway{}
 
-			// Run the function with mocked time
-			SendDailyEmails(db, logger, tt.currentTime)
+			// Run the function
+			SendDailyEmails(db, mockGateway, logger, tt.currentTime)
 
-			// Check number of prompts sent (via log)
+			// Check number of prompts sent
 			logOutput := logBuf.String()
-			sentCount := bytes.Count(logBuf.Bytes(), []byte("Sending prompt for"))
+			sentCount := bytes.Count(logBuf.Bytes(), []byte("Sent prompt for"))
 			if sentCount != tt.wantPrompts {
 				t.Errorf("Expected %d prompts sent, got %d; log: %q", tt.wantPrompts, sentCount, logOutput)
+			}
+			if len(mockGateway.sentPrompts) != tt.wantPrompts {
+				t.Errorf("Mock gateway expected %d prompts, got %d", tt.wantPrompts, len(mockGateway.sentPrompts))
 			}
 
 			// Verify the last prompt in the database

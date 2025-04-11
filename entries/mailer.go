@@ -6,8 +6,13 @@ import (
 	"time"
 )
 
+// EmailGateway defines the interface for sending email prompts.
+type EmailGateway interface {
+	SendPrompt(toName, toEmail, fromName, fromEmail, subject, body string) (messageID string, err error)
+}
+
 // RunDailyEmailTask starts a goroutine that triggers SendDailyEmails daily at 9 AM Eastern Time.
-func RunDailyEmailTask(db *sql.DB, logger *log.Logger) {
+func RunDailyEmailTask(db *sql.DB, emailGateway EmailGateway, logger *log.Logger) {
 	go func() {
 		loc, err := time.LoadLocation("America/New_York")
 		if err != nil {
@@ -25,7 +30,7 @@ func RunDailyEmailTask(db *sql.DB, logger *log.Logger) {
 			time.Sleep(duration)
 
 			logger.Printf("Running daily email task at %s", time.Now().In(loc))
-			SendDailyEmails(db, logger, time.Now().In(loc))
+			SendDailyEmails(db, emailGateway, logger, time.Now().In(loc))
 		}
 	}()
 }
@@ -33,10 +38,10 @@ func RunDailyEmailTask(db *sql.DB, logger *log.Logger) {
 // SendDailyEmails sends prompt emails to users, catching up on any missed days.
 // Assumes there is always at least one existing prompt for user_id=1.
 // now is the current time to use for determining the date range.
-func SendDailyEmails(db *sql.DB, logger *log.Logger, now time.Time) {
-	const userID = 1                                // Fixed user ID
-	loc, _ := time.LoadLocation("America/New_York") // Already checked in RunDailyEmailTask
-	today := now.In(loc).Truncate(24 * time.Hour)   // Today at 00:00:00
+func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, logger *log.Logger, now time.Time) {
+	const userID = 1 // Fixed user ID
+	loc, _ := time.LoadLocation("America/New_York")
+	today := now.In(loc).Truncate(24 * time.Hour)
 	logger.Printf("Today is %s", today.Format("2006-01-02"))
 
 	// Find the last prompt date for user_id=1
@@ -61,26 +66,31 @@ func SendDailyEmails(db *sql.DB, logger *log.Logger, now time.Time) {
 	startDate := lastPromptDate.Add(24 * time.Hour)
 	logger.Printf("Start date for prompts: %s", startDate.Format("2006-01-02"))
 	for date := startDate; !date.After(today); date = date.Add(24 * time.Hour) {
-		// Placeholder for email sending
-		messageID := "placeholder-" + date.Format("2006-01-02") // Temporary until SendGrid provides it
-		logger.Printf("Sending prompt for %s with message_id %s", date.Format("2006-01-02"), messageID)
+		// Construct email details
+		toName := "User"                    // Adjust as needed
+		toEmail := "your-email@example.com" // Replace with your email
+		fromName := "JourneyInbox Journal"
+		fromEmail := "journal.abcdef1@email.journeyinbox.com"
+		subject := "It’s " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
+		body := "<p>Reply to this prompt to update your journal.</p>"
 
-		// TODO: Replace with SendGrid API call
-		emailSentSuccessfully := true // Simulate success for now
-
-		if emailSentSuccessfully {
-			// Record the prompt in the database
-			_, err := db.Exec(`
-                INSERT INTO entries_prompt ("when", message_id, user_id) 
-                VALUES (?, ?, ?)`,
-				date.Format("2006-01-02"), messageID, userID)
-			if err != nil {
-				logger.Printf("Failed to insert prompt for %s: %v", date.Format("2006-01-02"), err)
-				continue // Move to next day, don’t stop
-			}
-			logger.Printf("Recorded prompt for %s", date.Format("2006-01-02"))
-		} else {
-			logger.Printf("Failed to send prompt for %s; skipping record", date.Format("2006-01-02"))
+		// Send email via gateway
+		messageID, err := emailGateway.SendPrompt(toName, toEmail, fromName, fromEmail, subject, body)
+		if err != nil {
+			logger.Printf("Failed to send prompt for %s: %v", date.Format("2006-01-02"), err)
+			continue
 		}
+		logger.Printf("Sent prompt for %s with message_id %s", date.Format("2006-01-02"), messageID)
+
+		// Record the prompt in the database
+		_, err = db.Exec(`
+            INSERT INTO entries_prompt ("when", message_id, user_id) 
+            VALUES (?, ?, ?)`,
+			date.Format("2006-01-02"), messageID, userID)
+		if err != nil {
+			logger.Printf("Failed to insert prompt for %s: %v", date.Format("2006-01-02"), err)
+			continue
+		}
+		logger.Printf("Recorded prompt for %s", date.Format("2006-01-02"))
 	}
 }
