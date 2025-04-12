@@ -9,6 +9,7 @@ from .transmitter import send_prompt
 
 @db_periodic_task(crontab(minute="0", hour="13"))
 def send_mail():
+    return
     print("Sending prompts to active accounts")
     accounts = Account.objects.promptable().select_related("user")
     today = timezone.localdate()
