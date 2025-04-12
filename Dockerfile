@@ -27,6 +27,8 @@ COPY --from=builder /app/app /app/app
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+
 # Set ownership (optional, as scratch has no chown command)
 # Since we're using a non-root user, ensure the binary is accessible
 USER 222:222
