@@ -1,53 +1,35 @@
+# Stage 1: Build environment
 FROM golang:1.24.1-bookworm AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-
-RUN go mod download
-
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o app .
-
-FROM python:3.12-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    UV_PROJECT_ENVIRONMENT=/usr/local
-
-COPY --from=ghcr.io/astral-sh/uv:0.5.2 /uv /bin/uv
-
-WORKDIR /app
-
+# Create non-root user and group in build stage
 RUN addgroup --gid 222 --system app \
     && adduser --uid 222 --system --group app
 
-RUN mkdir -p /app && chown app:app /app
+# Copy dependency files and download modules
+COPY go.mod go.sum ./
+RUN go mod download
 
-COPY --chown=app:app pyproject.toml uv.lock /app/
+# Copy source code and build
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o app .
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+# Stage 2: Runtime environment
+FROM scratch
 
-COPY --chown=app:app . /app/
+WORKDIR /app
 
-# Some configuration is needed to make Django happy, but these values have no
-# impact to collectstatic so we can use dummy values.
-RUN \
-    ADMIN_URL_PATH_TOKEN=fake-token \
-    ANYMAIL_WEBHOOK_SECRET=a-secret-to-everybody \
-    HASHID_FIELD_SALT=a-secret-to-everybody \
-    SECRET_KEY=a-secret-to-everybody \
-    SENDGRID_API_KEY=a-secret-to-everybody \
-    SENTRY_DSN=dsn_example \
-    SENTRY_ENABLED=off \
-    python manage.py collectstatic --noinput
+# Copy the binary from the builder stage
+COPY --from=builder /app/app /app/app
 
-USER app
+# Copy user and group definitions from builder
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
 
-COPY --from=builder --chown=app:app /app/app .
+# Set ownership (optional, as scratch has no chown command)
+# Since we're using a non-root user, ensure the binary is accessible
+USER 222:222
 
-ENTRYPOINT ["/app/bin/docker-entrypoint"]
 EXPOSE 8000
-CMD ["/app/bin/server"]
+CMD ["/app/app"]
