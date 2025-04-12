@@ -15,19 +15,6 @@ servers:
         timeout: 60
     cmd:
       /app/app
-  goweb:
-    hosts:
-      - 178.128.132.8
-    proxy:
-      app_port: 8080
-      host: beta.journeyinbox.com
-      ssl: true
-      healthcheck:
-        # The db migration might make the app take longer to boot up
-        # so provide more time before failing the health check.
-        timeout: 60
-    cmd:
-      /app/app
   worker:
     hosts:
       - 178.128.132.8

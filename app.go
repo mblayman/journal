@@ -107,8 +107,8 @@ func main() {
 
 	entries.RunDailyEmailTask(db, emailGateway, requiredToAddress, mattEmailAddress, logger)
 
-	logger.Println("Server starting on port 8080...")
-	err = http.ListenAndServe(":8080", mux)
+	logger.Println("Server starting on port 8000...")
+	err = http.ListenAndServe(":8000", mux)
 	if err != nil {
 		logger.Printf("Server failed to start: %v\n", err)
 	}
