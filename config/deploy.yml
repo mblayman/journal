@@ -15,12 +15,6 @@ servers:
         timeout: 60
     cmd:
       /app/app
-  worker:
-    hosts:
-      - 178.128.132.8
-    cmd:
-      # Don't waste time running the system checks.
-      python /app/manage.py run_huey --skip-checks
 
 registry:
   username: mblayman
