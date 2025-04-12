@@ -1,8 +1,0 @@
-Reply to this prompt to update your journal.
-{% if entry %}
-On your journey on {{ entry.when|date:"l, M. j, Y" }} ({{ delta }} ago), you wrote:
-
-{{ entry.body }}
-{% else %}
-You have no entries yet! As soon as you do, a random previous entry will appear in your prompt.
-{% endif %}
