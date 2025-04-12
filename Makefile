@@ -6,3 +6,6 @@ build:
 
 run-prod:
 	@env $$(kamal secrets print) $(MAKE) run
+
+test:
+	go test ./...
