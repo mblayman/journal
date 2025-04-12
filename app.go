@@ -19,9 +19,9 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-//go:embed go_templates
+//go:embed templates
 var templates embed.FS
-var tmpl = template.Must(template.ParseFS(templates, "go_templates/index.html"))
+var tmpl = template.Must(template.ParseFS(templates, "templates/index.html"))
 
 func index(w http.ResponseWriter, r *http.Request) {
 	err := tmpl.Execute(w, nil)
