@@ -1,9 +1,4 @@
 .env
 db.sqlite3
 node_modules/
-.coverage/
 .git/
-.pytest_cache/
-.ruff_cache/
-.venv/
-venv/
