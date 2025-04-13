@@ -29,6 +29,11 @@ COPY --from=builder /etc/group /etc/group
 
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
+# Copy the CA certificates from the builder stage
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+# Set the environment variable for Go to find the CA bundle
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
 # Set ownership (optional, as scratch has no chown command)
 # Since we're using a non-root user, ensure the binary is accessible
 USER 222:222
