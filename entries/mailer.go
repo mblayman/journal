@@ -172,7 +172,7 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, m
 		toEmail := mattEmailAddress
 		fromName := "JourneyInbox Journal"
 		fromEmail := requiredToAddress
-		subject := "It’s " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
+		subject := "It's " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
 
 		// Generate body with random entry
 		body, err := createPromptBody(db, today, logger)
