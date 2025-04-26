@@ -143,7 +143,6 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, m
 	const userID = 1 // Fixed user ID
 	loc, _ := time.LoadLocation("America/New_York")
 	today := now.In(loc).Truncate(24 * time.Hour)
-	logger.Printf("Today is %s", today.Format("2006-01-02"))
 
 	// Find the last prompt date for user_id=1
 	var lastPromptDateStr string
