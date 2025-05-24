@@ -160,11 +160,9 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, m
 		logger.Printf("Failed to parse last prompt date %q: %v", lastPromptDateStr, err)
 		return
 	}
-	logger.Printf("Last prompt date: %s", lastPromptDate.Format("2006-01-02"))
 
 	// Calculate missing days from last prompt to today
 	startDate := lastPromptDate.Add(24 * time.Hour)
-	logger.Printf("Start date for prompts: %s", startDate.Format("2006-01-02"))
 	for date := startDate; !date.After(today); date = date.Add(24 * time.Hour) {
 		// Construct email details
 		toName := "Matt Layman"
@@ -197,6 +195,5 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, m
 			logger.Printf("Failed to insert prompt for %s: %v", date.Format("2006-01-02"), err)
 			continue
 		}
-		logger.Printf("Recorded prompt for %s", date.Format("2006-01-02"))
 	}
 }
