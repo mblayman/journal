@@ -37,13 +37,15 @@ func up(w http.ResponseWriter, r *http.Request) {
 
 func getConfig() model.Config {
 	config := model.Config{
-		DatabaseDirectory: os.Getenv("DB_DIR"),
-		MattEmailAddress:  os.Getenv("MATT_EMAIL_ADDRESS"),
-		RequiredToAddress: os.Getenv("REQUIRED_TO_ADDRESS"),
-		SendGridAPIKey:    os.Getenv("SENDGRID_API_KEY"),
-		SentryDSN:         os.Getenv("SENTRY_DSN"),
-		UseAWS:            os.Getenv("USE_AWS"),
-		WebhookSecret:     os.Getenv("ANYMAIL_WEBHOOK_SECRET"),
+		AWSAccessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
+		AWSSecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
+		DatabaseDirectory:  os.Getenv("DB_DIR"),
+		MattEmailAddress:   os.Getenv("MATT_EMAIL_ADDRESS"),
+		RequiredToAddress:  os.Getenv("REQUIRED_TO_ADDRESS"),
+		SendGridAPIKey:     os.Getenv("SENDGRID_API_KEY"),
+		SentryDSN:          os.Getenv("SENTRY_DSN"),
+		UseAWS:             os.Getenv("USE_AWS"),
+		WebhookSecret:      os.Getenv("ANYMAIL_WEBHOOK_SECRET"),
 	}
 	return config
 }
@@ -111,6 +113,12 @@ func main() {
 	var emailGateway entries.EmailGateway
 	emailGateway = entries.NewSendGridGateway(config.SendGridAPIKey)
 	if config.UseAWS == "yes" {
+		if config.AWSAccessKeyID == "" {
+			log.Fatal("AWS_ACCESS_KEY_ID not set.")
+		}
+		if config.AWSSecretAccessKey == "" {
+			log.Fatal("AWS_SECRET_ACCESS_KEY not set.")
+		}
 		logger.Println("Using the AWS SES gateway.")
 		emailGateway = entries.NewAmazonSESGateway(config)
 	} else {
