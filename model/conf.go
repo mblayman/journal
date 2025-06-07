@@ -6,5 +6,6 @@ type Config struct {
 	RequiredToAddress string
 	SendGridAPIKey    string
 	SentryDSN         string
+	UseAWS            string
 	WebhookSecret     string
 }

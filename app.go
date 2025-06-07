@@ -42,6 +42,7 @@ func getConfig() model.Config {
 		RequiredToAddress: os.Getenv("REQUIRED_TO_ADDRESS"),
 		SendGridAPIKey:    os.Getenv("SENDGRID_API_KEY"),
 		SentryDSN:         os.Getenv("SENTRY_DSN"),
+		UseAWS:            os.Getenv("USE_AWS"),
 		WebhookSecret:     os.Getenv("ANYMAIL_WEBHOOK_SECRET"),
 	}
 	return config
@@ -107,7 +108,14 @@ func main() {
 	if config.SendGridAPIKey == "" {
 		log.Fatal("SENDGRID_API_KEY not set.")
 	}
-	emailGateway := entries.NewSendGridGateway(config.SendGridAPIKey)
+	var emailGateway entries.EmailGateway
+	emailGateway = entries.NewSendGridGateway(config.SendGridAPIKey)
+	if config.UseAWS == "yes" {
+		logger.Println("Using the AWS SES gateway.")
+		emailGateway = entries.NewAmazonSESGateway(config)
+	} else {
+		logger.Println("Using the SendGrid gateway.")
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)

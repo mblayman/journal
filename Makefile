@@ -9,3 +9,6 @@ run-prod:
 
 test:
 	go test ./...
+
+context:
+	uvx files-to-prompt --extension go .
