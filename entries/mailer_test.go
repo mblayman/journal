@@ -6,6 +6,8 @@ import (
 	"log"
 	"testing"
 	"time"
+
+	"github.com/mblayman/journal/model"
 )
 
 // MockEmailGateway is a testable implementation of EmailGateway.
@@ -112,11 +114,13 @@ func TestSendDailyEmails(t *testing.T) {
 			var logBuf bytes.Buffer
 			logger := log.New(&logBuf, "", 0)
 			mockGateway := &MockEmailGateway{}
-			requiredToAddress := "test@example.com"
-			mattEmailAddress := "matt@example.com"
+			config := model.Config{
+				MattEmailAddress:  "matt@example.com",
+				RequiredToAddress: "test@example.com",
+			}
 
 			// Run the function
-			SendDailyEmails(db, mockGateway, requiredToAddress, mattEmailAddress, logger, tt.currentTime)
+			SendDailyEmails(db, mockGateway, config, logger, tt.currentTime)
 
 			// Check number of prompts sent
 			logOutput := logBuf.String()

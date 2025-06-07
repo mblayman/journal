@@ -15,6 +15,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/joho/godotenv"
 	"github.com/mblayman/journal/entries"
+	"github.com/mblayman/journal/model"
 	"github.com/mblayman/journal/webhook"
 	_ "modernc.org/sqlite"
 )
@@ -34,14 +35,26 @@ func up(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "ok")
 }
 
-func getWebhookAuth() (string, string) {
-	webhookSecret := os.Getenv("ANYMAIL_WEBHOOK_SECRET")
-	if webhookSecret == "" {
+func getConfig() model.Config {
+	config := model.Config{
+		DatabaseDirectory: os.Getenv("DB_DIR"),
+		MattEmailAddress:  os.Getenv("MATT_EMAIL_ADDRESS"),
+		RequiredToAddress: os.Getenv("REQUIRED_TO_ADDRESS"),
+		SendGridAPIKey:    os.Getenv("SENDGRID_API_KEY"),
+		SentryDSN:         os.Getenv("SENTRY_DSN"),
+		WebhookSecret:     os.Getenv("ANYMAIL_WEBHOOK_SECRET"),
+	}
+	return config
+}
+
+func getWebhookAuth(config model.Config) (string, string) {
+
+	if config.WebhookSecret == "" {
 		log.Fatal("ANYMAIL_WEBHOOK_SECRET not set.")
 	}
-	parts := strings.Split(webhookSecret, ":")
+	parts := strings.Split(config.WebhookSecret, ":")
 	if len(parts) != 2 {
-		log.Fatalf("ANYMAIL_WEBHOOK_SECRET must be in format 'username:password', got: %s", webhookSecret)
+		log.Fatalf("ANYMAIL_WEBHOOK_SECRET must be in format 'username:password', got: %s", config.WebhookSecret)
 	}
 
 	username := parts[0]
@@ -56,10 +69,11 @@ func main() {
 		logger.Printf("Could not load .env file: %v (continuing without it)", err)
 	}
 
-	sentryDsn := os.Getenv("SENTRY_DSN")
-	if sentryDsn != "" {
+	config := getConfig()
+
+	if config.SentryDSN != "" {
 		err := sentry.Init(sentry.ClientOptions{
-			Dsn: sentryDsn,
+			Dsn: config.SentryDSN,
 		})
 		if err != nil {
 			log.Fatalf("sentry.Init: %s", err)
@@ -70,19 +84,17 @@ func main() {
 		logger.Println("Sentry is disabled.")
 	}
 
-	requiredToAddress := os.Getenv("REQUIRED_TO_ADDRESS")
-	if requiredToAddress == "" {
+	if config.RequiredToAddress == "" {
 		log.Fatal("REQUIRED_TO_ADDRESS not set.")
 	}
 
-	mattEmailAddress := os.Getenv("MATT_EMAIL_ADDRESS")
-	if mattEmailAddress == "" {
+	if config.MattEmailAddress == "" {
 		log.Fatal("MATT_EMAIL_ADDRESS not set.")
 	}
 
 	dbPath := "./db.sqlite3"
-	if dir := os.Getenv("DB_DIR"); dir != "" {
-		dbPath = filepath.Join(dir, "db.sqlite3")
+	if config.DatabaseDirectory != "" {
+		dbPath = filepath.Join(config.DatabaseDirectory, "db.sqlite3")
 	}
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -92,20 +104,19 @@ func main() {
 	logger.Printf("Opened database at %s.", dbPath)
 
 	// Email gateway setup
-	sendgridAPIKey := os.Getenv("SENDGRID_API_KEY")
-	if sendgridAPIKey == "" {
+	if config.SendGridAPIKey == "" {
 		log.Fatal("SENDGRID_API_KEY not set.")
 	}
-	emailGateway := entries.NewSendGridGateway(sendgridAPIKey)
+	emailGateway := entries.NewSendGridGateway(config.SendGridAPIKey)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
-	username, password := getWebhookAuth()
-	processor := entries.MakeEmailContentProcessor(requiredToAddress, db, logger)
+	username, password := getWebhookAuth(config)
+	processor := entries.MakeEmailContentProcessor(config.RequiredToAddress, db, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 
-	entries.RunDailyEmailTask(db, emailGateway, requiredToAddress, mattEmailAddress, logger)
+	entries.RunDailyEmailTask(db, emailGateway, config, logger)
 
 	logger.Println("Server starting on port 8000...")
 	err = http.ListenAndServe(":8000", mux)

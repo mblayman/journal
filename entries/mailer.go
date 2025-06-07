@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
+	"github.com/mblayman/journal/model"
 )
 
 //go:embed templates
@@ -23,7 +24,7 @@ type EmailGateway interface {
 }
 
 // RunDailyEmailTask starts a goroutine that triggers SendDailyEmails daily at 9 AM Eastern Time.
-func RunDailyEmailTask(db *sql.DB, emailGateway EmailGateway, requiredToAddress, mattEmailAddress string, logger *log.Logger) {
+func RunDailyEmailTask(db *sql.DB, emailGateway EmailGateway, config model.Config, logger *log.Logger) {
 	go func() {
 		loc, err := time.LoadLocation("America/New_York")
 		if err != nil {
@@ -41,7 +42,7 @@ func RunDailyEmailTask(db *sql.DB, emailGateway EmailGateway, requiredToAddress,
 			time.Sleep(duration)
 
 			logger.Printf("Running daily email task at %s", time.Now().In(loc))
-			SendDailyEmails(db, emailGateway, requiredToAddress, mattEmailAddress, logger, time.Now().In(loc))
+			SendDailyEmails(db, emailGateway, config, logger, time.Now().In(loc))
 		}
 	}()
 }
@@ -139,7 +140,7 @@ func createPromptBody(db *sql.DB, today time.Time, logger *log.Logger) (string, 
 // SendDailyEmails sends prompt emails to users, catching up on any missed days.
 // Assumes there is always at least one existing prompt for user_id=1.
 // now is the current time to use for determining the date range.
-func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, mattEmailAddress string, logger *log.Logger, now time.Time) {
+func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, config model.Config, logger *log.Logger, now time.Time) {
 	const userID = 1 // Fixed user ID
 	loc, _ := time.LoadLocation("America/New_York")
 	today := now.In(loc).Truncate(24 * time.Hour)
@@ -166,9 +167,9 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, requiredToAddress, m
 	for date := startDate; !date.After(today); date = date.Add(24 * time.Hour) {
 		// Construct email details
 		toName := "Matt Layman"
-		toEmail := mattEmailAddress
+		toEmail := config.MattEmailAddress
 		fromName := "JourneyInbox Journal"
-		fromEmail := requiredToAddress
+		fromEmail := config.RequiredToAddress
 		subject := "It's " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
 
 		// Generate body with random entry
