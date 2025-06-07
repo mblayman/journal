@@ -15,3 +15,6 @@ context:
 
 deploy:
 	~/.asdf/shims/kamal deploy
+
+logs:
+	~/.asdf/shims/kamal app logs -r web
