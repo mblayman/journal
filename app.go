@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"embed"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -51,7 +52,6 @@ func getConfig() model.Config {
 }
 
 func getWebhookAuth(config model.Config) (string, string) {
-
 	if config.WebhookSecret == "" {
 		log.Fatal("ANYMAIL_WEBHOOK_SECRET not set.")
 	}
@@ -125,6 +125,27 @@ func main() {
 		logger.Println("Using the SendGrid gateway.")
 	}
 
+	// Parse command-line flags
+	emailDate := flag.String("email", "", "Send an email prompt for the specified date (YYYY-MM-DD)")
+	flag.Parse()
+
+	if *emailDate != "" {
+		// Parse the provided date
+		date, err := time.Parse("2006-01-02", *emailDate)
+		if err != nil {
+			logger.Fatalf("Invalid date format for --email: %v (use YYYY-MM-DD)", err)
+		}
+		// Send email for the specified date
+		logger.Printf("Sending email prompt for %s", *emailDate)
+		err = entries.SendEmailForDate(db, emailGateway, config, logger, date)
+		if err != nil {
+			logger.Fatalf("Failed to send email prompt: %v", err)
+		}
+		logger.Println("Email prompt sent successfully")
+		os.Exit(0)
+	}
+
+	// Normal server operation if no --email flag
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)

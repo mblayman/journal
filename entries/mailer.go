@@ -137,6 +137,43 @@ func createPromptBody(db *sql.DB, today time.Time, logger *log.Logger) (string, 
 	return buf.String(), nil
 }
 
+// SendEmailForDate sends an email prompt for a specific date.
+func SendEmailForDate(db *sql.DB, emailGateway EmailGateway, config model.Config, logger *log.Logger, date time.Time) error {
+	// Construct email details
+	toName := "Matt Layman"
+	toEmail := config.MattEmailAddress
+	fromName := "JourneyInbox Journal"
+	fromEmail := config.RequiredToAddress
+	subject := "It's " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
+
+	// Generate body with random entry
+	body, err := createPromptBody(db, date, logger)
+	if err != nil {
+		logger.Printf("Failed to create prompt body for %s: %v", date.Format("2006-01-02"), err)
+		return err
+	}
+
+	// Send email via gateway
+	messageID, err := emailGateway.SendPrompt(toName, toEmail, fromName, fromEmail, subject, body)
+	if err != nil {
+		logger.Printf("Failed to send prompt for %s: %v", date.Format("2006-01-02"), err)
+		return err
+	}
+	logger.Printf("Sent prompt for %s with message_id %s", date.Format("2006-01-02"), messageID)
+
+	// Record the prompt in the database
+	_, err = db.Exec(`
+        INSERT INTO entries_prompt ("when", message_id, user_id) 
+        VALUES (?, ?, ?)`,
+		date.Format("2006-01-02"), messageID, 1)
+	if err != nil {
+		logger.Printf("Failed to insert prompt for %s: %v", date.Format("2006-01-02"), err)
+		return err
+	}
+
+	return nil
+}
+
 // SendDailyEmails sends prompt emails to users, catching up on any missed days.
 // Assumes there is always at least one existing prompt for user_id=1.
 // now is the current time to use for determining the date range.
@@ -165,35 +202,7 @@ func SendDailyEmails(db *sql.DB, emailGateway EmailGateway, config model.Config,
 	// Calculate missing days from last prompt to today
 	startDate := lastPromptDate.Add(24 * time.Hour)
 	for date := startDate; !date.After(today); date = date.Add(24 * time.Hour) {
-		// Construct email details
-		toName := "Matt Layman"
-		toEmail := config.MattEmailAddress
-		fromName := "JourneyInbox Journal"
-		fromEmail := config.RequiredToAddress
-		subject := "It's " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
-
-		// Generate body with random entry
-		body, err := createPromptBody(db, today, logger)
-		if err != nil {
-			logger.Printf("Failed to create prompt body for %s: %v", date.Format("2006-01-02"), err)
-			continue
-		}
-
-		// Send email via gateway
-		messageID, err := emailGateway.SendPrompt(toName, toEmail, fromName, fromEmail, subject, body)
-		if err != nil {
-			logger.Printf("Failed to send prompt for %s: %v", date.Format("2006-01-02"), err)
-			continue
-		}
-		logger.Printf("Sent prompt for %s with message_id %s", date.Format("2006-01-02"), messageID)
-
-		// Record the prompt in the database
-		_, err = db.Exec(`
-            INSERT INTO entries_prompt ("when", message_id, user_id) 
-            VALUES (?, ?, ?)`,
-			date.Format("2006-01-02"), messageID, userID)
-		if err != nil {
-			logger.Printf("Failed to insert prompt for %s: %v", date.Format("2006-01-02"), err)
+		if err := SendEmailForDate(db, emailGateway, config, logger, date); err != nil {
 			continue
 		}
 	}
