@@ -42,6 +42,7 @@ func getConfig() model.Config {
 		AWSSecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		DatabaseDirectory:  os.Getenv("DB_DIR"),
 		MattEmailAddress:   os.Getenv("MATT_EMAIL_ADDRESS"),
+		ReplyToAddress:     os.Getenv("REPLY_TO_ADDRESS"),
 		RequiredToAddress:  os.Getenv("REQUIRED_TO_ADDRESS"),
 		SendGridAPIKey:     os.Getenv("SENDGRID_API_KEY"),
 		SentryDSN:          os.Getenv("SENTRY_DSN"),

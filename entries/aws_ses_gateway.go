@@ -38,7 +38,7 @@ func NewAmazonSESGateway(conf model.Config) *AmazonSESGateway {
 }
 
 // SendPrompt sends an HTML email prompt via AWS SES and returns the message ID.
-func (g *AmazonSESGateway) SendPrompt(toName, toEmail, fromName, fromEmail, subject, body string) (string, error) {
+func (g *AmazonSESGateway) SendPrompt(toName, toEmail, fromName, fromEmail, replyToAddress, subject, body string) (string, error) {
 	// Format the destination email address
 	destination := &types.Destination{
 		ToAddresses: []string{toName + " <" + toEmail + ">"},
@@ -66,9 +66,10 @@ func (g *AmazonSESGateway) SendPrompt(toName, toEmail, fromName, fromEmail, subj
 
 	// Create the input for SendEmail
 	input := &ses.SendEmailInput{
-		Source:      aws.String(fromName + " <" + fromEmail + ">"),
-		Destination: destination,
-		Message:     message,
+		Source:           aws.String(fromName + " <" + fromEmail + ">"),
+		Destination:      destination,
+		Message:          message,
+		ReplyToAddresses: []string{replyToAddress},
 	}
 
 	// Send the email

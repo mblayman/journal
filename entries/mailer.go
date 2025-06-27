@@ -20,7 +20,15 @@ var promptTmpl = template.Must(template.ParseFS(templates, "templates/prompt.htm
 
 // EmailGateway defines the interface for sending email prompts.
 type EmailGateway interface {
-	SendPrompt(toName, toEmail, fromName, fromEmail, subject, body string) (messageID string, err error)
+	SendPrompt(
+		toName,
+		toEmail,
+		fromName,
+		fromEmail,
+		replyToAddress,
+		subject,
+		body string,
+	) (messageID string, err error)
 }
 
 // RunDailyEmailTask starts a goroutine that triggers SendDailyEmails daily at 9 AM Eastern Time.
@@ -144,6 +152,7 @@ func SendEmailForDate(db *sql.DB, emailGateway EmailGateway, config model.Config
 	toEmail := config.MattEmailAddress
 	fromName := "JourneyInbox Journal"
 	fromEmail := config.RequiredToAddress
+	replyToAddress := config.ReplyToAddress
 	subject := "It's " + date.Weekday().String() + ", " + date.Format("Jan. 2, 2006") + ". How are you?"
 
 	// Generate body with random entry
@@ -154,7 +163,7 @@ func SendEmailForDate(db *sql.DB, emailGateway EmailGateway, config model.Config
 	}
 
 	// Send email via gateway
-	messageID, err := emailGateway.SendPrompt(toName, toEmail, fromName, fromEmail, subject, body)
+	messageID, err := emailGateway.SendPrompt(toName, toEmail, fromName, fromEmail, replyToAddress, subject, body)
 	if err != nil {
 		logger.Printf("Failed to send prompt for %s: %v", date.Format("2006-01-02"), err)
 		return err

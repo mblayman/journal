@@ -5,6 +5,7 @@ type Config struct {
 	AWSSecretAccessKey string
 	DatabaseDirectory  string
 	MattEmailAddress   string
+	ReplyToAddress     string
 	RequiredToAddress  string
 	SendGridAPIKey     string
 	SentryDSN          string

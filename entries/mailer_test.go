@@ -15,7 +15,7 @@ type MockEmailGateway struct {
 	sentPrompts []struct{ subject, body string }
 }
 
-func (m *MockEmailGateway) SendPrompt(toName, toEmail, fromName, fromEmail, subject, body string) (string, error) {
+func (m *MockEmailGateway) SendPrompt(toName, toEmail, fromName, fromEmail, replyToAddress, subject, body string) (string, error) {
 	m.sentPrompts = append(m.sentPrompts, struct{ subject, body string }{subject, body})
 	return "mock-msg-" + time.Now().Format("20060102150405"), nil // Dummy message ID
 }

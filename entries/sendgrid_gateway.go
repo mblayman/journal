@@ -20,7 +20,7 @@ func NewSendGridGateway(apiKey string) *SendGridGateway {
 }
 
 // SendPrompt sends an HTML email prompt via SendGrid and returns the message ID.
-func (g *SendGridGateway) SendPrompt(toName, toEmail, fromName, fromEmail, subject, body string) (string, error) {
+func (g *SendGridGateway) SendPrompt(toName, toEmail, fromName, fromEmail, replyToAddress, subject, body string) (string, error) {
 	from := mail.NewEmail(fromName, fromEmail)
 	to := mail.NewEmail(toName, toEmail)
 	message := mail.NewSingleEmail(from, subject, to, "", body) // Empty plain text, HTML body
