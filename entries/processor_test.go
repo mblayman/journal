@@ -29,7 +29,7 @@ func TestMakeEmailContentProcessor(t *testing.T) {
 			name:       "Matching To address with valid Subject and Text (insert)",
 			requiredTo: "journal.abcdef1@email.journeyinbox.com",
 			emailContent: model.EmailContent{
-				To:      "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>",
+				To:      "journal.abcdef1@email.journeyinbox.com",
 				Subject: "It's Wednesday, Mar. 26, 2025. How are you?",
 				Text: `I got up this morning at 8:30 and brushed my teeth, then left to go to Cafe
 Ibiza to meet with Jared. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -54,7 +54,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 			name:       "Matching To address with valid Subject and Text (update)",
 			requiredTo: "journal.abcdef1@email.journeyinbox.com",
 			emailContent: model.EmailContent{
-				To:      "JourneyInbox Journal <journal.abcdef1@email.journeyinbox.com>",
+				To:      "journal.abcdef1@email.journeyinbox.com",
 				Subject: "It's Wednesday, Mar. 26, 2025. How are you?",
 				Text: `Updated entry for March 26th. I had coffee instead of tea today.
 
@@ -78,7 +78,7 @@ On Wed, Mar 26, 2025, 9:00 AM JourneyInbox Journal <journal.abcdef1@email.journe
 			name:       "Non-matching To address with valid Subject and Text",
 			requiredTo: "journal.abcdef1@email.journeyinbox.com",
 			emailContent: model.EmailContent{
-				To:      "JourneyInbox Journal <journal.xyz789@email.journeyinbox.com>",
+				To:      "journal.xyz789@email.journeyinbox.com",
 				Subject: "It's Wednesday, Mar. 26, 2025. How are you?",
 				Text:    "Some text\nOn Wed, Mar 26, 2025, 9:00 AM JourneyInbox Journal <journal.xyz789@email.journeyinbox.com> wrote:\n>",
 			},
@@ -134,7 +134,11 @@ On Wed, Mar 26, 2025, 9:00 AM JourneyInbox Journal <journal.abcdef1@email.journe
 			logger := log.New(&logBuf, "", log.LstdFlags)
 
 			// Create and run processor
-			processor := MakeEmailContentProcessor(tt.requiredTo, db, logger)
+			conf := model.Config{
+				RequiredToAddress: tt.requiredTo,
+				ReplyToAddress:    tt.requiredTo,
+			}
+			processor := MakeEmailContentProcessor(conf, db, logger)
 			processor(tt.emailContent)
 
 			// Check log output

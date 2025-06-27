@@ -10,10 +10,10 @@ import (
 	"github.com/mblayman/journal/model"
 )
 
-func MakeEmailContentProcessor(requiredToAddress string, db *sql.DB, logger *log.Logger) model.EmailContentProcessor {
+func MakeEmailContentProcessor(conf model.Config, db *sql.DB, logger *log.Logger) model.EmailContentProcessor {
 	return func(emailContent model.EmailContent) {
-		if emailContent.ToAddress() != requiredToAddress {
-			logger.Printf("Invalid To address: %s", emailContent.ToAddress())
+		if emailContent.To != conf.ReplyToAddress {
+			logger.Printf("Invalid To address: %s", emailContent.To)
 			return
 		}
 
@@ -23,7 +23,7 @@ func MakeEmailContentProcessor(requiredToAddress string, db *sql.DB, logger *log
 			return
 		}
 
-		replyText := emailContent.Reply()
+		replyText := emailContent.Reply(conf)
 		userID := int64(1)                   // Fixed user_id value
 		dateStr := date.Format("2006-01-02") // SQLite date format (YYYY-MM-DD)
 		query := `

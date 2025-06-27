@@ -92,6 +92,10 @@ func main() {
 		log.Fatal("REQUIRED_TO_ADDRESS not set.")
 	}
 
+	if config.ReplyToAddress == "" {
+		log.Fatal("REPLY_TO_ADDRESS not set.")
+	}
+
 	if config.MattEmailAddress == "" {
 		log.Fatal("MATT_EMAIL_ADDRESS not set.")
 	}
@@ -108,11 +112,7 @@ func main() {
 	logger.Printf("Opened database at %s.", dbPath)
 
 	// Email gateway setup
-	if config.SendGridAPIKey == "" {
-		log.Fatal("SENDGRID_API_KEY not set.")
-	}
 	var emailGateway entries.EmailGateway
-	emailGateway = entries.NewSendGridGateway(config.SendGridAPIKey)
 	if config.UseAWS == "yes" {
 		if config.AWSAccessKeyID == "" {
 			log.Fatal("AWS_ACCESS_KEY_ID not set.")
@@ -123,7 +123,11 @@ func main() {
 		logger.Println("Using the AWS SES gateway.")
 		emailGateway = entries.NewAmazonSESGateway(config)
 	} else {
+		if config.SendGridAPIKey == "" {
+			log.Fatal("SENDGRID_API_KEY not set.")
+		}
 		logger.Println("Using the SendGrid gateway.")
+		emailGateway = entries.NewSendGridGateway(config.SendGridAPIKey)
 	}
 
 	// Parse command-line flags
@@ -151,8 +155,9 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 	username, password := getWebhookAuth(config)
-	processor := entries.MakeEmailContentProcessor(config.RequiredToAddress, db, logger)
+	processor := entries.MakeEmailContentProcessor(config, db, logger)
 	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
+	mux.HandleFunc("/ses-webhook", webhook.SESWebhookHandler(username, password, processor, logger))
 
 	entries.RunDailyEmailTask(db, emailGateway, config, logger)
 
