@@ -28,6 +28,7 @@ builder:
 env:
   clear:
     DB_DIR: /var/db
+    USE_AWS: "yes"
   secret:
     - ANYMAIL_WEBHOOK_SECRET
     - AWS_ACCESS_KEY_ID
