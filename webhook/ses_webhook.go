@@ -59,6 +59,28 @@ func SESWebhookHandler(username, password string, processor model.EmailContentPr
 			return
 		}
 
+		// Check for SNS SubscriptionConfirmation
+		var snsMessage map[string]interface{}
+		if err := json.Unmarshal(body, &snsMessage); err == nil {
+			if snsMessage["Type"] == "SubscriptionConfirmation" {
+				subscribeURL, ok := snsMessage["SubscribeURL"].(string)
+				if ok {
+					logger.Printf("Confirming SNS subscription: %s", subscribeURL)
+					resp, err := http.Get(subscribeURL)
+					if err != nil {
+						logger.Printf("Failed to confirm SNS subscription: %v", err)
+						http.Error(w, "Error confirming subscription", http.StatusInternalServerError)
+						return
+					}
+					defer resp.Body.Close()
+					logger.Printf("SNS subscription confirmed")
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte("ok"))
+					return
+				}
+			}
+		}
+
 		var payload SESWebhookPayload
 		if err := json.Unmarshal(body, &payload); err != nil {
 			logger.Printf("Error parsing JSON payload: %v, body: %s", err, string(body))
