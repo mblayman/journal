@@ -44,9 +44,7 @@ func getConfig() model.Config {
 		MattEmailAddress:   os.Getenv("MATT_EMAIL_ADDRESS"),
 		ReplyToAddress:     os.Getenv("REPLY_TO_ADDRESS"),
 		RequiredToAddress:  os.Getenv("REQUIRED_TO_ADDRESS"),
-		SendGridAPIKey:     os.Getenv("SENDGRID_API_KEY"),
 		SentryDSN:          os.Getenv("SENTRY_DSN"),
-		UseAWS:             os.Getenv("USE_AWS"),
 		WebhookSecret:      os.Getenv("ANYMAIL_WEBHOOK_SECRET"),
 	}
 	return config
@@ -111,24 +109,13 @@ func main() {
 	defer db.Close()
 	logger.Printf("Opened database at %s.", dbPath)
 
-	// Email gateway setup
-	var emailGateway entries.EmailGateway
-	if config.UseAWS == "yes" {
-		if config.AWSAccessKeyID == "" {
-			log.Fatal("AWS_ACCESS_KEY_ID not set.")
-		}
-		if config.AWSSecretAccessKey == "" {
-			log.Fatal("AWS_SECRET_ACCESS_KEY not set.")
-		}
-		logger.Println("Using the AWS SES gateway.")
-		emailGateway = entries.NewAmazonSESGateway(config)
-	} else {
-		if config.SendGridAPIKey == "" {
-			log.Fatal("SENDGRID_API_KEY not set.")
-		}
-		logger.Println("Using the SendGrid gateway.")
-		emailGateway = entries.NewSendGridGateway(config.SendGridAPIKey)
+	if config.AWSAccessKeyID == "" {
+		log.Fatal("AWS_ACCESS_KEY_ID not set.")
 	}
+	if config.AWSSecretAccessKey == "" {
+		log.Fatal("AWS_SECRET_ACCESS_KEY not set.")
+	}
+	emailGateway := entries.NewAmazonSESGateway(config)
 
 	// Parse command-line flags
 	emailDate := flag.String("email", "", "Send an email prompt for the specified date (YYYY-MM-DD)")
@@ -156,7 +143,6 @@ func main() {
 	mux.HandleFunc("/up", up)
 	username, password := getWebhookAuth(config)
 	processor := entries.MakeEmailContentProcessor(config, db, logger)
-	mux.HandleFunc("/webhook", webhook.WebhookHandler(username, password, processor, logger))
 	mux.HandleFunc("/ses-webhook", webhook.SESWebhookHandler(username, password, processor, logger))
 
 	entries.RunDailyEmailTask(db, emailGateway, config, logger)

@@ -7,8 +7,6 @@ type Config struct {
 	MattEmailAddress   string
 	ReplyToAddress     string
 	RequiredToAddress  string
-	SendGridAPIKey     string
 	SentryDSN          string
-	UseAWS             string
 	WebhookSecret      string
 }
