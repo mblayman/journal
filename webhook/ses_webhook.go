@@ -45,7 +45,6 @@ func SESWebhookHandler(username, password string, processor model.EmailContentPr
 
 		u, p, ok := r.BasicAuth()
 		if !ok || u != username || p != password {
-			logger.Printf("Unauthorized access attempt")
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
