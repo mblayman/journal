@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"embed"
 	"flag"
@@ -58,10 +59,124 @@ func getWebhookAuth(config model.Config) (string, string) {
 	if len(parts) != 2 {
 		log.Fatalf("ANYMAIL_WEBHOOK_SECRET must be in format 'username:password', got: %s", config.WebhookSecret)
 	}
-
 	username := parts[0]
 	password := parts[1]
 	return username, password
+}
+
+// fixParagraphs removes newlines within paragraphs, preserving double newlines between them.
+func fixParagraphs(text string) string {
+	// Split into paragraphs by double newlines
+	paragraphs := strings.Split(strings.TrimSpace(text), "\n\n")
+	var fixedParagraphs []string
+	for _, para := range paragraphs {
+		if para == "" {
+			continue
+		}
+		// Join lines within a paragraph, replacing single newlines with spaces
+		lines := strings.Split(para, "\n")
+		trimmedLines := make([]string, 0, len(lines))
+		for _, line := range lines {
+			if trimmed := strings.TrimSpace(line); trimmed != "" {
+				trimmedLines = append(trimmedLines, trimmed)
+			}
+		}
+		if len(trimmedLines) == 0 {
+			continue
+		}
+		fixedPara := strings.Join(trimmedLines, " ")
+		fixedParagraphs = append(fixedParagraphs, fixedPara)
+	}
+	return strings.Join(fixedParagraphs, "\n\n")
+}
+
+// fixEntryForDate processes an entry for the given date: displays it, shows corrected version, and updates if confirmed.
+func fixEntryForDate(db *sql.DB, date time.Time, logger *log.Logger) error {
+	const userID = 1
+	dateStr := date.Format("2006-01-02")
+	var body string
+	err := db.QueryRow(`
+        SELECT body 
+        FROM entries_entry 
+        WHERE user_id = ? AND "when" = ?`, userID, dateStr).Scan(&body)
+	if err == sql.ErrNoRows {
+		logger.Printf("No entry found for user %d on %s", userID, dateStr)
+		return fmt.Errorf("no entry found for %s", dateStr)
+	}
+	if err != nil {
+		logger.Printf("Failed to query entry for user %d on %s: %v", userID, dateStr, err)
+		return err
+	}
+
+	fmt.Printf("\nCurrent entry for %s:\n---\n%s\n---\n", dateStr, body)
+
+	// Generate corrected version
+	correctedBody := fixParagraphs(body)
+	fmt.Printf("\nCorrected entry (newlines within paragraphs removed):\n---\n%s\n---\n", correctedBody)
+
+	// Prompt for confirmation
+	fmt.Print("Update entry with corrected version? (y/n): ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	response := strings.TrimSpace(strings.ToLower(scanner.Text()))
+	if response != "y" {
+		fmt.Println("Update cancelled.")
+		return nil
+	}
+
+	// Update the entry
+	_, err = db.Exec(`
+        UPDATE entries_entry 
+        SET body = ? 
+        WHERE user_id = ? AND "when" = ?`, correctedBody, userID, dateStr)
+	if err != nil {
+		logger.Printf("Failed to update entry for user %d on %s: %v", userID, dateStr, err)
+		return err
+	}
+	logger.Printf("Updated entry for user %d on %s", userID, dateStr)
+
+	// Requery to confirm update
+	var updatedBody string
+	err = db.QueryRow(`
+        SELECT body 
+        FROM entries_entry 
+        WHERE user_id = ? AND "when" = ?`, userID, dateStr).Scan(&updatedBody)
+	if err != nil {
+		logger.Printf("Failed to requery entry for user %d on %s: %v", userID, dateStr, err)
+		return err
+	}
+
+	fmt.Printf("\nConfirmed updated entry for %s:\n---\n%s\n---\n", dateStr, updatedBody)
+	return nil
+}
+
+// listEntryDates queries and prints all entry dates for user_id=1 in YYYY-MM-DD format.
+func listEntryDatesF(db *sql.DB, logger *log.Logger) error {
+	const userID = 1
+	rows, err := db.Query(`
+        SELECT strftime('%Y-%m-%d', "when") 
+        FROM entries_entry 
+        WHERE user_id = ? 
+        ORDER BY "when"`, userID)
+	if err != nil {
+		logger.Printf("Failed to query entry dates for user %d: %v", userID, err)
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var dateStr string
+		if err := rows.Scan(&dateStr); err != nil {
+			logger.Printf("Failed to scan date: %v", err)
+			return err
+		}
+		fmt.Println(dateStr)
+	}
+	if err := rows.Err(); err != nil {
+		logger.Printf("Error iterating rows: %v", err)
+		return err
+	}
+	return nil
 }
 
 func main() {
@@ -119,7 +234,35 @@ func main() {
 
 	// Parse command-line flags
 	emailDate := flag.String("email", "", "Send an email prompt for the specified date (YYYY-MM-DD)")
+	fixEntryDate := flag.String("fix-entry-date", "", "Fix paragraph newlines for the entry on the specified date (YYYY-MM-DD)")
+	listEntryDates := flag.Bool("list-entry-dates", false, "List all entry dates for user_id=1 in YYYY-MM-DD format")
 	flag.Parse()
+
+	if *listEntryDates {
+		logger.Println("Listing all entry dates")
+		err := listEntryDatesF(db, logger)
+		if err != nil {
+			logger.Fatalf("Failed to list entry dates: %v", err)
+		}
+		logger.Println("Entry dates listed successfully")
+		os.Exit(0)
+	}
+
+	if *fixEntryDate != "" {
+		// Parse the provided date
+		date, err := time.Parse("2006-01-02", *fixEntryDate)
+		if err != nil {
+			logger.Fatalf("Invalid date format for --fix-entry-date: %v (use YYYY-MM-DD)", err)
+		}
+		// Process the entry for the specified date
+		logger.Printf("Processing entry for %s", *fixEntryDate)
+		err = fixEntryForDate(db, date, logger)
+		if err != nil {
+			logger.Fatalf("Failed to process entry: %v", err)
+		}
+		logger.Println("Entry processing completed")
+		os.Exit(0)
+	}
 
 	if *emailDate != "" {
 		// Parse the provided date
@@ -137,7 +280,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Normal server operation if no --email flag
+	// Normal server operation if no flags
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
@@ -147,6 +290,7 @@ func main() {
 
 	entries.RunDailyEmailTask(db, emailGateway, config, logger)
 
+	// Start the server
 	logger.Println("Server starting on port 8000...")
 	err = http.ListenAndServe(":8000", mux)
 	if err != nil {
