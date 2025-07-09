@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -70,12 +71,30 @@ func journalHandler(db *sql.DB, config model.Config, logger *log.Logger) http.Ha
 			return
 		}
 
+		// Get the 'when' query parameter
+		requestedYear := r.URL.Query().Get("when")
+		var yearFilter *int
+		if requestedYear != "" {
+			yearInt, err := strconv.Atoi(requestedYear)
+			if err == nil && yearInt >= 1900 && yearInt <= time.Now().Year() {
+				yearFilter = &yearInt
+			} else {
+				logger.Printf("Invalid 'when' parameter: %s", requestedYear)
+				// Proceed without filtering if the year is invalid
+			}
+		}
+
 		// Query all entries for user_id=1, ordered by date descending
-		rows, err := db.Query(`
-            SELECT strftime('%Y-%m-%d', "when"), body 
-            FROM entries_entry 
-            WHERE user_id = 1 
-            ORDER BY "when" DESC`)
+		query := `SELECT strftime('%Y-%m-%d', "when"), body 
+                  FROM entries_entry 
+                  WHERE user_id = 1`
+		args := []interface{}{}
+		if yearFilter != nil {
+			query += ` AND strftime('%Y', "when") = ?`
+			args = append(args, fmt.Sprintf("%04d", *yearFilter))
+		}
+		query += ` ORDER BY "when" DESC`
+		rows, err := db.Query(query, args...)
 		if err != nil {
 			logger.Printf("Failed to query journal entries: %v", err)
 			http.Error(w, "Failed to fetch entries", http.StatusInternalServerError)
@@ -104,6 +123,11 @@ func journalHandler(db *sql.DB, config model.Config, logger *log.Logger) http.Ha
 			}
 			year := date.Format("2006")
 			month := date.Format("January")
+
+			// Skip entries not matching the year filter, if set
+			if yearFilter != nil && year != fmt.Sprintf("%04d", *yearFilter) {
+				continue
+			}
 
 			// Split body into paragraphs
 			paragraphs := strings.Split(strings.TrimSpace(body), "\n\n")
@@ -184,14 +208,12 @@ func journalHandler(db *sql.DB, config model.Config, logger *log.Logger) http.Ha
 			Entries: entriesByYear,
 		}
 
-		// Render the template
+		// Set Content-Type before rendering
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = tmpl.ExecuteTemplate(w, "journal.html", data)
 		if err != nil {
 			logger.Printf("Failed to render journal template: %v", err)
-			// Only call http.Error if the response hasn't been committed
-			if w.Header().Get("Content-Type") == "" {
-				http.Error(w, "Failed to render template", http.StatusInternalServerError)
-			}
+			// Avoid calling http.Error since response may have started
 			return
 		}
 	}
