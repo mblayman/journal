@@ -24,10 +24,10 @@ import (
 
 //go:embed templates
 var templates embed.FS
-var tmpl = template.Must(template.ParseFS(templates, "templates/index.html"))
+var tmpl = template.Must(template.ParseFS(templates, "templates/index.html", "templates/journal.html"))
 
 func index(w http.ResponseWriter, r *http.Request) {
-	err := tmpl.Execute(w, nil)
+	err := tmpl.ExecuteTemplate(w, "index.html", nil)
 	if err != nil {
 		http.Error(w, "Failed to render template", http.StatusInternalServerError)
 	}
@@ -35,6 +35,166 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func up(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "ok")
+}
+
+// JournalEntry holds data for a single journal entry.
+type JournalEntry struct {
+	When       string
+	Paragraphs []string
+}
+
+// MonthEntries holds entries for a specific month.
+type MonthEntries struct {
+	Name    string
+	Entries []JournalEntry
+}
+
+// YearEntries holds months and their entries for a specific year.
+type YearEntries struct {
+	Months []MonthEntries
+}
+
+// JournalData holds the data for the journal template.
+type JournalData struct {
+	Years   []string
+	Entries map[string]YearEntries
+}
+
+func journalHandler(db *sql.DB, config model.Config, logger *log.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Basic authentication
+		username, password, ok := r.BasicAuth()
+		if !ok || username != config.JournalUser || password != config.JournalPassword {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Journal"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Query all entries for user_id=1, ordered by date descending
+		rows, err := db.Query(`
+            SELECT strftime('%Y-%m-%d', "when"), body 
+            FROM entries_entry 
+            WHERE user_id = 1 
+            ORDER BY "when" DESC`)
+		if err != nil {
+			logger.Printf("Failed to query journal entries: %v", err)
+			http.Error(w, "Failed to fetch entries", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		// Organize entries by year and month
+		entriesByYear := make(map[string]YearEntries)
+		var years []string
+		yearSet := make(map[string]bool)
+
+		for rows.Next() {
+			var whenStr, body string
+			if err := rows.Scan(&whenStr, &body); err != nil {
+				logger.Printf("Failed to scan entry: %v", err)
+				http.Error(w, "Failed to process entries", http.StatusInternalServerError)
+				return
+			}
+
+			// Parse date to extract year and month
+			date, err := time.Parse("2006-01-02", whenStr)
+			if err != nil {
+				logger.Printf("Failed to parse date %s: %v", whenStr, err)
+				continue
+			}
+			year := date.Format("2006")
+			month := date.Format("January")
+
+			// Split body into paragraphs
+			paragraphs := strings.Split(strings.TrimSpace(body), "\n\n")
+			trimmedParagraphs := make([]string, 0, len(paragraphs))
+			for _, para := range paragraphs {
+				if trimmed := strings.TrimSpace(para); trimmed != "" {
+					trimmedParagraphs = append(trimmedParagraphs, trimmed)
+				}
+			}
+
+			// Add to entriesByYear
+			yearEntries, exists := entriesByYear[year]
+			if !exists {
+				yearEntries = YearEntries{Months: []MonthEntries{}}
+				entriesByYear[year] = yearEntries
+				if !yearSet[year] {
+					years = append(years, year)
+					yearSet[year] = true
+				}
+			}
+
+			// Find or create month
+			var monthEntries *MonthEntries
+			for i, m := range yearEntries.Months {
+				if m.Name == month {
+					monthEntries = &yearEntries.Months[i]
+					break
+				}
+			}
+			if monthEntries == nil {
+				yearEntries.Months = append(yearEntries.Months, MonthEntries{Name: month, Entries: []JournalEntry{}})
+				monthEntries = &yearEntries.Months[len(yearEntries.Months)-1]
+			}
+
+			// Add entry to month
+			monthEntries.Entries = append(monthEntries.Entries, JournalEntry{When: whenStr, Paragraphs: trimmedParagraphs})
+			entriesByYear[year] = yearEntries
+		}
+		if err := rows.Err(); err != nil {
+			logger.Printf("Error iterating rows: %v", err)
+			http.Error(w, "Failed to process entries", http.StatusInternalServerError)
+			return
+		}
+
+		// Sort months within each year (in reverse chronological order)
+		for year, yearEntries := range entriesByYear {
+			sortedMonths := make([]MonthEntries, len(yearEntries.Months))
+			copy(sortedMonths, yearEntries.Months)
+			for i, month := range sortedMonths {
+				monthTime, _ := time.Parse("January", month.Name)
+				sortedMonths[i].Name = monthTime.Format("January") // Ensure consistent formatting
+			}
+			// Sort months by parsing month name to time
+			for i := 0; i < len(sortedMonths)-1; i++ {
+				for j := i + 1; j < len(sortedMonths); j++ {
+					monthI, _ := time.Parse("January", sortedMonths[i].Name)
+					monthJ, _ := time.Parse("January", sortedMonths[j].Name)
+					if monthJ.After(monthI) {
+						sortedMonths[i], sortedMonths[j] = sortedMonths[j], sortedMonths[i]
+					}
+				}
+			}
+			entriesByYear[year] = YearEntries{Months: sortedMonths}
+		}
+
+		// Sort years in descending order
+		for i := 0; i < len(years)-1; i++ {
+			for j := i + 1; j < len(years); j++ {
+				if years[j] > years[i] {
+					years[i], years[j] = years[j], years[i]
+				}
+			}
+		}
+
+		// Prepare data for template
+		data := JournalData{
+			Years:   years,
+			Entries: entriesByYear,
+		}
+
+		// Render the template
+		err = tmpl.ExecuteTemplate(w, "journal.html", data)
+		if err != nil {
+			logger.Printf("Failed to render journal template: %v", err)
+			// Only call http.Error if the response hasn't been committed
+			if w.Header().Get("Content-Type") == "" {
+				http.Error(w, "Failed to render template", http.StatusInternalServerError)
+			}
+			return
+		}
+	}
 }
 
 func getConfig() model.Config {
@@ -47,6 +207,8 @@ func getConfig() model.Config {
 		RequiredToAddress:  os.Getenv("REQUIRED_TO_ADDRESS"),
 		SentryDSN:          os.Getenv("SENTRY_DSN"),
 		WebhookSecret:      os.Getenv("ANYMAIL_WEBHOOK_SECRET"),
+		JournalUser:        os.Getenv("JOURNAL_USER"),
+		JournalPassword:    os.Getenv("JOURNAL_PASSWORD"),
 	}
 	return config
 }
@@ -150,7 +312,7 @@ func fixEntryForDate(db *sql.DB, date time.Time, logger *log.Logger) error {
 	return nil
 }
 
-// listEntryDates queries and prints all entry dates for user_id=1 in YYYY-MM-DD format.
+// listEntryDatesF queries and prints all entry dates for user_id=1 in YYYY-MM-DD format.
 func listEntryDatesF(db *sql.DB, logger *log.Logger) error {
 	const userID = 1
 	rows, err := db.Query(`
@@ -211,6 +373,13 @@ func main() {
 
 	if config.MattEmailAddress == "" {
 		log.Fatal("MATT_EMAIL_ADDRESS not set.")
+	}
+
+	if config.JournalUser == "" {
+		log.Fatal("JOURNAL_USER not set.")
+	}
+	if config.JournalPassword == "" {
+		log.Fatal("JOURNAL_PASSWORD not set.")
 	}
 
 	dbPath := "./db.sqlite3"
@@ -284,6 +453,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
+	mux.HandleFunc("/journal", journalHandler(db, config, logger))
 	username, password := getWebhookAuth(config)
 	processor := entries.MakeEmailContentProcessor(config, db, logger)
 	mux.HandleFunc("/ses-webhook", webhook.SESWebhookHandler(username, password, processor, logger))

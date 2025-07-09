@@ -9,4 +9,6 @@ type Config struct {
 	RequiredToAddress  string
 	SentryDSN          string
 	WebhookSecret      string
+	JournalUser        string
+	JournalPassword    string
 }

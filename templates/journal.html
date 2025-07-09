@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Entries</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        ul { margin: 10px 0; }
+        li { margin: 5px 0; }
+        p { margin: 10px 0; }
+        .year-list, .month-list { list-style-type: disc; margin-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Journal Entries</h1>
+    <!-- Yearly navigation -->
+    <ul class="year-list">
+        {{range .Years}}
+        <li><a href="#year-{{.}}">{{.}}</a></li>
+        {{end}}
+    </ul>
+
+    <!-- Journal entries grouped by year and month -->
+    {{ range $year := .Years }}
+      <h2 id="year-{{ $year }}">{{ $year }}</h2>
+      <!-- Monthly navigation for this year -->
+      <ul class="month-list">
+        {{ with $yearEntries := index $.Entries $year }}
+          {{ range $month := $yearEntries.Months }}
+            <li><a href="#month-{{ $year }}-{{ $month.Name }}">{{ $month.Name }}</a></li>
+          {{ end }}
+        {{ end }}
+      </ul>
+      {{ with $yearEntries := index $.Entries $year }}
+        {{ range $month := $yearEntries.Months }}
+          <h3 id="month-{{ $year }}-{{ $month.Name }}">{{ $month.Name }}</h3>
+          {{ range $entry := $month.Entries }}
+            <div>
+              <p><strong>{{ $entry.When }}</strong></p>
+              {{ range $para := $entry.Paragraphs }}
+                <p>{{ $para }}</p>
+              {{ end }}
+            </div>
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+</body>
+</html>

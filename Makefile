@@ -11,7 +11,7 @@ test:
 	go test ./...
 
 context:
-	uvx files-to-prompt --extension go .
+	uvx files-to-prompt --extension go --extension html .
 
 deploy:
 	~/.asdf/shims/kamal deploy
