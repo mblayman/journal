@@ -18,3 +18,8 @@ deploy:
 
 logs:
 	~/.asdf/shims/kamal app logs -r web
+
+.PHONY: bootstrap
+
+bootstrap:
+	go run . --bootstrap

@@ -3,3 +3,5 @@
 
 # Go
 /app
+# AI does a go build and creates the default binary name
+/journal

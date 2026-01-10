@@ -36,12 +36,12 @@
         {{ range $month := $yearEntries.Months }}
           <h3 id="month-{{ $year }}-{{ $month.Name }}">{{ $month.Name }}</h3>
           {{ range $entry := $month.Entries }}
-            <div>
-              <p><strong>{{ $entry.When }}</strong></p>
-              {{ range $para := $entry.Paragraphs }}
-                <p>{{ $para }}</p>
-              {{ end }}
-            </div>
+             <div>
+               <p><strong><a href="/edit?date={{ $entry.When }}">{{ $entry.When }}</a></strong></p>
+               {{ range $para := $entry.Paragraphs }}
+                 <p>{{ $para }}</p>
+               {{ end }}
+             </div>
           {{ end }}
         {{ end }}
       {{ end }}

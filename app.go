@@ -25,7 +25,7 @@ import (
 
 //go:embed templates
 var templates embed.FS
-var tmpl = template.Must(template.ParseFS(templates, "templates/index.html", "templates/journal.html"))
+var tmpl = template.Must(template.ParseFS(templates, "templates/index.html", "templates/journal.html", "templates/edit.html"))
 
 func index(w http.ResponseWriter, r *http.Request) {
 	err := tmpl.ExecuteTemplate(w, "index.html", nil)
@@ -219,6 +219,72 @@ func journalHandler(db *sql.DB, config model.Config, logger *log.Logger) http.Ha
 	}
 }
 
+func editHandler(db *sql.DB, config model.Config, logger *log.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Basic authentication
+		username, password, ok := r.BasicAuth()
+		if !ok || username != config.JournalUser || password != config.JournalPassword {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Journal"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var data struct {
+			Date  string
+			Body  string
+			Error string
+		}
+
+		date := r.URL.Query().Get("date")
+		data.Date = date
+
+		if r.Method == "POST" {
+			body := r.FormValue("body")
+			body = fixParagraphs(body)
+			if body == "" {
+				data.Error = "Entry body cannot be empty."
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				err := tmpl.ExecuteTemplate(w, "edit.html", data)
+				if err != nil {
+					logger.Printf("Failed to render edit template: %v", err)
+				}
+				return
+			}
+
+			_, err := db.Exec(`UPDATE entries_entry SET body = ? WHERE "when" = ? AND user_id = 1`, body, date)
+			if err != nil {
+				data.Error = "Failed to update entry: " + err.Error()
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				err := tmpl.ExecuteTemplate(w, "edit.html", data)
+				if err != nil {
+					logger.Printf("Failed to render edit template: %v", err)
+				}
+				return
+			}
+
+			http.Redirect(w, r, "/journal", http.StatusSeeOther)
+			return
+		}
+
+		// GET request
+		row := db.QueryRow(`SELECT body FROM entries_entry WHERE "when" = ? AND user_id = 1`, date)
+		err := row.Scan(&data.Body)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				data.Error = "No entry found for this date."
+			} else {
+				data.Error = "Failed to load entry: " + err.Error()
+			}
+		}
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		err = tmpl.ExecuteTemplate(w, "edit.html", data)
+		if err != nil {
+			logger.Printf("Failed to render edit template: %v", err)
+		}
+	}
+}
+
 func getConfig() model.Config {
 	config := model.Config{
 		AWSAccessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
@@ -250,6 +316,9 @@ func getWebhookAuth(config model.Config) (string, string) {
 
 // fixParagraphs removes newlines within paragraphs, preserving double newlines between them.
 func fixParagraphs(text string) string {
+	// Normalize line endings to \n
+	text = strings.ReplaceAll(text, "\r\n", "\n")
+	text = strings.ReplaceAll(text, "\r", "\n")
 	// Split into paragraphs by double newlines
 	paragraphs := strings.Split(strings.TrimSpace(text), "\n\n")
 	var fixedParagraphs []string
@@ -338,9 +407,9 @@ func fixEntryForDate(db *sql.DB, date time.Time, logger *log.Logger) error {
 func listEntryDatesF(db *sql.DB, logger *log.Logger) error {
 	const userID = 1
 	rows, err := db.Query(`
-        SELECT strftime('%Y-%m-%d', "when") 
-        FROM entries_entry 
-        WHERE user_id = ? 
+        SELECT strftime('%Y-%m-%d', "when")
+        FROM entries_entry
+        WHERE user_id = ?
         ORDER BY "when"`, userID)
 	if err != nil {
 		logger.Printf("Failed to query entry dates for user %d: %v", userID, err)
@@ -359,6 +428,62 @@ func listEntryDatesF(db *sql.DB, logger *log.Logger) error {
 	if err := rows.Err(); err != nil {
 		logger.Printf("Error iterating rows: %v", err)
 		return err
+	}
+	return nil
+}
+
+// bootstrapDB inserts fake entries for the last 14 days, skipping if entry already exists.
+func bootstrapDB(db *sql.DB, logger *log.Logger) error {
+	// Ensure table exists
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS entries_entry ("when" TEXT PRIMARY KEY, body TEXT, user_id INTEGER)`)
+	if err != nil {
+		logger.Printf("Failed to create table: %v", err)
+		return err
+	}
+
+	const userID = 1
+	fakeBodies := []string{
+		"Today was a productive day. I worked on my project and made good progress. The weather was nice, which helped my mood.",
+		"Spent time reading a new book. It's fascinating. Also cooked a new recipe that turned out great.",
+		"Went for a walk in the park. Saw some birds and enjoyed the fresh air. Feeling refreshed.",
+		"Attended a meeting that was insightful. Learned a lot about the upcoming changes in the industry.",
+		"Worked on personal development. Meditated and journaled. It's important to reflect regularly.",
+		"Caught up with an old friend over coffee. We talked about life and shared laughs.",
+		"Explored a new hobby. Painting is relaxing and creative. Can't wait to try more.",
+		"Had a challenging day at work, but overcame the obstacles. Growth comes from challenges.",
+		"Watched a documentary that was eye-opening. It made me think about the world differently.",
+		"Exercised in the morning. Felt energized all day. Health is wealth.",
+		"Volunteered at a local event. Giving back feels good and connects me with the community.",
+		"Listened to a podcast on innovation. Got some ideas for my own projects.",
+		"Spent quality time with family. Shared stories and created memories.",
+		"Reflected on goals. Made a plan for the week ahead. Motivation is key.",
+	}
+
+	now := time.Now()
+	for i := 13; i >= 0; i-- {
+		date := now.AddDate(0, 0, -i)
+		dateStr := date.Format("2006-01-02")
+		body := fakeBodies[i%len(fakeBodies)] + fmt.Sprintf(" (Entry for %s)", dateStr)
+
+		// Check if entry exists
+		var count int
+		err := db.QueryRow(`SELECT COUNT(*) FROM entries_entry WHERE "when" = ? AND user_id = ?`, dateStr, userID).Scan(&count)
+		if err != nil {
+			logger.Printf("Failed to check existing entry for %s: %v", dateStr, err)
+			return err
+		}
+		if count > 0 {
+			logger.Printf("Entry already exists for %s, skipping", dateStr)
+			continue
+		}
+
+		// Insert fake entry
+		_, err = db.Exec(`INSERT INTO entries_entry ("when", body, user_id) VALUES (?, ?, ?)`, dateStr, body, userID)
+		if err != nil {
+			logger.Printf("Failed to insert fake entry for %s: %v", dateStr, err)
+			return err
+		}
+		logger.Printf("Inserted fake entry for %s", dateStr)
 	}
 	return nil
 }
@@ -427,6 +552,7 @@ func main() {
 	emailDate := flag.String("email", "", "Send an email prompt for the specified date (YYYY-MM-DD)")
 	fixEntryDate := flag.String("fix-entry-date", "", "Fix paragraph newlines for the entry on the specified date (YYYY-MM-DD)")
 	listEntryDates := flag.Bool("list-entry-dates", false, "List all entry dates for user_id=1 in YYYY-MM-DD format")
+	bootstrapFlag := flag.Bool("bootstrap", false, "Bootstrap DB with fake entries for the last 14 days")
 	flag.Parse()
 
 	if *listEntryDates {
@@ -436,6 +562,16 @@ func main() {
 			logger.Fatalf("Failed to list entry dates: %v", err)
 		}
 		logger.Println("Entry dates listed successfully")
+		os.Exit(0)
+	}
+
+	if *bootstrapFlag {
+		logger.Println("Bootstrapping DB with fake entries")
+		err := bootstrapDB(db, logger)
+		if err != nil {
+			logger.Fatalf("Failed to bootstrap DB: %v", err)
+		}
+		logger.Println("DB bootstrapped successfully")
 		os.Exit(0)
 	}
 
@@ -476,6 +612,7 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/up", up)
 	mux.HandleFunc("/journal", journalHandler(db, config, logger))
+	mux.HandleFunc("/edit", editHandler(db, config, logger))
 	username, password := getWebhookAuth(config)
 	processor := entries.MakeEmailContentProcessor(config, db, logger)
 	mux.HandleFunc("/ses-webhook", webhook.SESWebhookHandler(username, password, processor, logger))
